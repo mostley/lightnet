@@ -1,4 +1,5 @@
 var Light = require('../models/light');
+var Vector3 = require('../models/math/vector3');
 
 var buffer = {};
 
@@ -49,38 +50,46 @@ module.exports = function(router) {
     });
 
 
-  router.route('/control/:x/:y/:z')
+  router.route('/control/:x/:y/:z?precise=:precise')
 
     // get the color of the light at those coordinates (GET http://localhost:4020/api/control/:x/:y/:z)
     .get(function(req, res) {
-      var x = req.params.x;
-      var y = req.params.y;
-      var z = req.params.z;
-      console.log('get light color at [' + x + ':' + y + ':' + z + ']');
+      var pos = new Vector3(req.params.x, req.params.y, req.params.z);
+      var precise = !!req.params.precise;
+      if (!precise) {
+        pos.floor();
+      }
+      console.log('get light color at ' + pos.toString());
 
-      if (buffer[x] && buffer[x][y] && buffer[x][y][z]) {
-        res.json(buffer[x][y][z]);
+      if (buffer[pos.x] && buffer[pos.x][pos.y] && buffer[pos.x][pos.y][pos.z]) {
+        res.json(buffer[pos.x][pos.y][pos.z]);
       } else {
         res.status(404);
       }
     })
 
-    // update the light at those coordinates (PUT http://localhost:4020/api/control/:x/:y/:z)
+    // update the light at those coordinates (PUT http://localhost:4020/api/control/:x/:y/:z?precise=:precise)
     .put(function(req, res) {
-      var x = req.params.x;
-      var y = req.params.y;
-      var z = req.params.z;
+      var pos = new Vector3(req.params.x, req.params.y, req.params.z);
       var color = req.params.color;
-      console.log('update light color at [' + x + ':' + y + ':' + z + ']');
+      var precise = !!req.params.precise;
+      if (!precise) {
+        pos.floor();
+      }
+      console.log('update light color at ' + pos.toString());
 
-      Light.find({ x: x, y: y, z: z}, function(err, lights) {
+      buffer[pos.x][pos.y][pos.z] = color;
+
+      Light.find(function(err, lights) {
         if (err) {
           console.error(err);
           res.send(err);
         }
 
         for (var i=0; i<lights.length; i++) {
-          lights[i].setColor(color);
+          if (lights[i].isAt(pos, precise)) {
+            lights[i].setColor(color);
+          }
         };
       });
     });

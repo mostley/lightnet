@@ -5,6 +5,7 @@ var docs = require("express-mongoose-docs");
 
 var config = require('./config');
 var lightRoutes = require('./routes/lightroutes');
+var controlRoutes = require('./routes/controlroutes');
 var discoverer = require('./discoverer');
 var pinger = require('./pinger');
 
@@ -38,6 +39,7 @@ router.get('/', function(req, res) {
 });
 
 lightRoutes(router);
+controlRoutes(router);
 
 // REGISTER ROUTES -------------------------------
 app.use('/api', router);
