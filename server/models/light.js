@@ -69,7 +69,6 @@ LightSchema.methods.setColor = function (color) {
         .on('response', function(response) {
             console.log("Result of Light change: " + response.statusCode);
         });
-    });
 };
 
 module.exports = mongoose.model('Light', LightSchema);
