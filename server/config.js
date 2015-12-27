@@ -5,5 +5,6 @@ module.exports = {
   discoveryPort: 2525,
   discoveryInterval: 3000,
   machinePingInterval: 3000,
-  discoveryMulticastAddress: '239.255.255.250'
+  //discoveryMulticastAddress: '239.255.255.250'
+  discoveryMulticastAddress: '224.0.0.1'
 };

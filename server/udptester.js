@@ -1,5 +1,6 @@
 var PORT = 2525;
-var MULTICAST_ADDR = '239.255.255.250';
+//var MULTICAST_ADDR = '239.255.255.250';
+var MULTICAST_ADDR = '224.0.0.1';
 var dgram = require('dgram');
 var client = dgram.createSocket('udp4');
 

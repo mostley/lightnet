@@ -23,8 +23,9 @@ byte packetBuffer[512]; //buffer to hold incoming and outgoing packets
 
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP Udp;
-//IPAddress ipMulti(192, 168, 0, 255);
-IPAddress ipMulti(239, 255, 255, 250);
+//IPAddress ipMulti(239, 255, 255, 250);
+//IPAddress ipMulti(224, 0, 0, 1);
+IPAddress ipMulti(239, 0, 0, 57);
 unsigned int portMulti = 2525;
 
 void setup()
@@ -36,6 +37,7 @@ void setup()
   }*/
 
   // setting up Station AP
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   
   // Wait for connect to AP
@@ -58,6 +60,7 @@ void setup()
   Serial.println("Connected to wifi");
   
   if (!Udp.beginMulticast(WiFi.localIP(), ipMulti, portMulti)) {
+  //if (!Udp.begin(portMulti)) {
     Serial.print("failed to start UDP Server at port ");
   } else {
     Serial.print("Udp Multicast server started at : ");
@@ -119,4 +122,6 @@ void printWifiStatus() {
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
+
+  WiFi.printDiag(Serial);
 }
