@@ -1,7 +1,7 @@
 /*
  * 31 mar 2015
  * This sketch display UDP packets coming from an UDP client.
- * On a Mac the NC command can be used to send UDP. (nc -u 192.168.1.101 2390). 
+ * On a Mac the NC command can be used to send UDP. (nc -u 192.168.1.101 2390).
  *
  * Configuration : Enter the ssid and password of your Wifi AP. Enter the port number your server is listening on.
  *
@@ -9,6 +9,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUDP.h>
+#include <ArduinoJson.h>
 
 extern "C" {  //required for read Vdd Voltage
 #include "user_interface.h"
@@ -28,6 +29,10 @@ WiFiUDP Udp;
 IPAddress ipMulti(239, 0, 0, 57);
 unsigned int portMulti = 2525;
 
+const char* serverAddress = "";
+bool isInitialized = false;
+WiFiClient client;
+
 void setup()
 {
   // Open serial communications and wait for port to open:
@@ -39,7 +44,7 @@ void setup()
   // setting up Station AP
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
-  
+
   // Wait for connect to AP
   Serial.print("[Connecting]");
   Serial.print(ssid);
@@ -58,7 +63,7 @@ void setup()
   printWifiStatus();
 
   Serial.println("Connected to wifi");
-  
+
   if (!Udp.beginMulticast(WiFi.localIP(), ipMulti, portMulti)) {
   //if (!Udp.begin(portMulti)) {
     Serial.print("failed to start UDP Server at port ");
@@ -72,9 +77,64 @@ void setup()
 
 void loop()
 {
+  if (isInitialized) {
+    handleLEDs();
+  } else if (serverAddress == "") {
+    listenForServer();
+  } else {
+    if (!lightIsRegistered()) {
+      registerLight();
+    } else {
+      isInitialized = true;
+    }
+  }
+}
+
+void handleLEDs() {
+  
+}
+
+void registerLight() {
+  
+}
+
+bool lightIsRegistered() {
+  bool result = false;
+  
+  Serial.println("trying to determine whether the light is already registered");
+  
+  if (client.connect(serverAddress, 80)) {
+    client.print("GET /api/lights/");
+    client.print(ESP.getFlashChipId());
+    client.println(" HTTP/1.1");
+    client.print("Host: ");
+    client.println(serverAddress);
+    client.println("Connection: close");
+    client.println();
+
+    delay(10);
+
+    while(client.available()) {
+      String line = client.readStringUntil('\r');
+      Serial.print(line);
+    }
+
+    //TODO check for 404
+
+  } else {
+    Serial.print("failed to connect to the LightNet Server (");
+    Serial.print(serverAddress);
+    Serial.println(")");
+  }
+  
+  return result;
+}
+
+void listenForServer()
+{
   int noBytes = Udp.parsePacket();
   String received_command = "";
-  
+
   if ( noBytes ) {
     Serial.print(millis() / 1000);
     Serial.print(":Packet of ");
@@ -98,16 +158,30 @@ void loop()
       else Serial.print(' ');
     } // end for
     Serial.println();
-    
+
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
     Udp.write("Answer from ESP8266 ChipID#");
     Udp.print(system_get_chip_id());
     Udp.write("#IP of ESP8266#");
     Udp.println(WiFi.localIP());
     Udp.endPacket();
+
+
+    StaticJsonBuffer<256> jsonBuffer;
+    JsonObject& root = jsonBuffer.parseObject(received_command);
     
-    Serial.println(received_command);
-    Serial.println();
+    const char* hostname = root["hostname"];
+    const char* version  = root["version"];
+    const char* name     = root["name"];
+
+    if (name == "LightNet") {
+      Serial.print("Received Server Address for LightNet v");
+      Serial.print(version);
+      Serial.print(" - ");
+      Serial.println(hostname);
+
+      serverAddress = hostname;
+    }
   } // end if
 
 
