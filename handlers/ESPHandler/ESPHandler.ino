@@ -74,10 +74,11 @@ void loop()
   } else if (isInitialized) {
     handleLEDs();
   } else if (serverAddress == "") { // has server data received
-    if (multicastServerIsStarted) {
+    if (!multicastServerIsStarted) {
       startMulticastServer();
     } else {
       listenForServer();
+      delay(100);
     }
   } else {
     if (!lightIsRegistered()) {
