@@ -16,6 +16,10 @@ extern "C" {  //required for read Vdd Voltage
   // uint16 readvdd33(void);
 }
 
+const int NUMBER_OF_LIGHTS = 96;
+const char* HANDLER_INFO = "ESP8266-based APA102 Handler";
+const char* VERSION = "1.0.0";
+
 int status = WL_IDLE_STATUS;
 const char* ssid = "matrix";  //  your network SSID (name)
 const char* pass = "einlangesundtollespasswort";       // your network password
@@ -24,8 +28,6 @@ byte packetBuffer[512]; //buffer to hold incoming and outgoing packets
 
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP Udp;
-//IPAddress ipMulti(239, 255, 255, 250);
-//IPAddress ipMulti(224, 0, 0, 1);
 IPAddress ipMulti(239, 0, 0, 57);
 unsigned int portMulti = 2525;
 
@@ -82,8 +84,8 @@ void loop()
       delay(100);
     }
   } else {
-    if (!lightIsRegistered()) {
-      registerLight();
+    if (!handlerIsRegistered()) {
+      registerHandler();
       delay(500);
     } else {
       isInitialized = true;
@@ -111,23 +113,7 @@ void startMulticastServer() {
   }
 }
 
-void handleLEDs() {
-  Serial.println("> handleLEDs()");
-  
-}
-
-void registerLight() {
-  Serial.println("> registerLight()");
-  // ESP.getFlashChipId()
-}
-
-bool lightIsRegistered() {
-  Serial.println("> lightIsRegistered()");
-  
-  bool result = false;
-  
-  Serial.println("trying to determine whether the light is already registered");
-
+int connectToAPI() {
   int addressLength = serverAddress.length()+1;
   char address[addressLength];
   serverAddress.toCharArray(address, addressLength);
@@ -140,28 +126,9 @@ bool lightIsRegistered() {
     error = 0;
     Serial.print("Unable to resolve hostname. ERR: ");
     Serial.println(error);
-  }
+  } 
   
-  if (error) {
-    client.print("GET /api/lights/");
-    client.print(ESP.getFlashChipId());
-    //client.print(system_get_chip_id(),HEX);
-    client.println(" HTTP/1.1");
-    client.print("Host: ");
-    client.println(serverAddress);
-    client.println("Connection: close");
-    client.println();
-
-    delay(10);
-
-    while(client.available()) {
-      String line = client.readStringUntil('\r');
-      Serial.print(line);
-    }
-
-    //TODO check for 404
-
-  } else {
+  if (!error) {
     Serial.print("failed to connect to the LightNet Server (");
     Serial.print(address);
     Serial.print(":");
@@ -169,6 +136,120 @@ bool lightIsRegistered() {
     Serial.print(") ERR: ");
     Serial.println(error);
   }
+
+  return error;
+}
+
+int sendHTTPHeader() {
+  client.print("Host: ");
+  client.println(serverAddress);
+  client.println("Connection: close");
+}
+
+void handleLEDs() {
+  Serial.println("> handleLEDs()");
+  delay(1000); //TODO handle apa
+}
+
+int registerHandler() { 
+  Serial.println("> registerHandler();");
+
+  int error = 0;
+
+  if (connectToAPI()) {
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    char ipstr[26];
+    IPAddress ip = WiFi.localIP();
+    sprintf(ipstr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+    root["handler"] = ipstr;
+    
+    root["handlerID"] = ESP.getFlashChipId();
+    root["handlerInfo"] = HANDLER_INFO;
+    root["handlerType"] = 0;
+    root["handlerVersion"] = VERSION;
+    root["handlerOffsetX"] = 0;
+    root["handlerOffsetY"] = 0;
+    root["handlerOffsetZ"] = 0;
+    root["handlerGeometry"] = "Cube";
+    root["handlerGeometryWidth"] = 8;
+    root["handlerGeometryHeight"] = 1;
+    root["handlerGeometryLength"] = 12;
+    root["handlerNumberOfLights"] = NUMBER_OF_LIGHTS;
+    
+    client.println("POST /api/handlers HTTP/1.1");
+    sendHTTPHeader();
+    client.println("Content-Type: application/json; charset=utf-8");
+    client.print("Content-Length: ");
+    client.println(root.measureLength());
+    client.println();
+    root.printTo(client);
+
+    delay(10);
+    String line = client.readStringUntil('\r');
+    Serial.println(line);
+
+    while(client.available()) {
+      String line = client.readStringUntil('\r');
+      Serial.print(line);
+    }
+
+    if (line.startsWith("HTTP/1.1 200 OK")) {
+      Serial.println("handler is registered.");
+      error = 1;
+    } else {
+      Serial.println("unrecognized status code or error");
+    }
+
+    client.stop();
+
+  }
+  
+  Serial.print("< ");
+  Serial.println(error);
+
+  return error;
+}
+
+bool handlerIsRegistered() {
+  Serial.println("> handlerIsRegistered()");
+  
+  bool result = false;
+  
+  Serial.println("trying to determine whether the handler is already registered");
+
+  if (connectToAPI()) {
+    client.print("GET /api/handlers/");
+    client.print(ESP.getFlashChipId());
+    client.println(" HTTP/1.1");
+    sendHTTPHeader();
+    client.println();
+
+    delay(10);
+    String line = client.readStringUntil('\r');
+    Serial.println(line);
+
+    while(client.available()) {
+      String line = client.readStringUntil('\r');
+      Serial.println(line);
+    }
+
+    if (line.startsWith("HTTP/1.1 404 Not Found")) {
+      Serial.println("handler not yet registered");
+      result = false;
+    } else if (line.startsWith("HTTP/1.1 200 OK")) {
+      // TODO check if light count has changed
+      
+      Serial.println("handler already registered");
+      result = true;
+    } else {
+      Serial.println("unrecognized status code or error");
+    }
+
+    client.stop();
+
+  }
+  
   Serial.print("< ");
   Serial.println(result);
   

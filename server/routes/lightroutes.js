@@ -43,7 +43,7 @@ module.exports = function(router) {
     .get(function(req, res) {
       console.log('get light ' + req.params.light_id);
 
-      Light.findOne({ id: req.params.light_id }, function(err, light) {
+      Light.findById(req.params.light_id, function(err, light) {
         if (err) {
           console.error(err);
           res.send(err);
@@ -52,6 +52,7 @@ module.exports = function(router) {
         if (light) {
           res.json(light);
         } else {
+          console.log("< no light with that ID yet.");
           res.status(404).send('Not found');
         }
       });

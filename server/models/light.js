@@ -16,6 +16,9 @@ var LightSchema   = new Schema({
     // The IP of the Handler responsible for this Light
     handler: String,
 
+    // the Handler id
+    handlerID: String,
+
     // Some Information about the Handler.
     handlerInfo: String,
 
@@ -29,6 +32,11 @@ var LightSchema   = new Schema({
     handlerOffsetX: Number,
     handlerOffsetY: Number,
     handlerOffsetZ: Number,
+
+    handlerGeometry: String,
+    handlerGeometryWidth: Number,
+    handlerGeometryHeight: Number,
+    handlerGeometryLength: Number,
 
     // The index of the Light on the Handler
     index: Number
@@ -52,6 +60,36 @@ LightSchema.methods.isAt = function (position, precise) {
     } else {
         return this.getVector().floor().equals(position);
     }
+};
+
+LightSchema.methods.updateCoordinates = function () {
+    switch (this.handlerGeometry) {
+        case "Cube":
+            this.updateCubeCoordinates();
+            break;
+        default:
+            console.error("Unknown handler geometry ", this.handlerGeometry);
+            break;
+    }
+};
+
+LightSchema.methods.updateCubeCoordinates = function () {
+    this.x = this.index % this.handlerGeometry.Width;
+    this.y = Math.floor(this.index / this.handlerGeometry.Width);
+    this.z = Math.floor(this.y / this.handlerGeometry.Length);
+};
+
+LightSchema.methods.toHandler = function() {
+    return {
+        ipAddress: this.handler,
+        id: this.handlerID,
+        info: this.handlerInfo,
+        type: this.handlerType,
+        version: this.handlerVersion,
+        offsetX: this.handlerOffsetX,
+        offsetY: this.handlerOffsetY,
+        offsetZ: this.handlerOffsetZ
+    };
 };
 
 LightSchema.methods.setColor = function (color) {

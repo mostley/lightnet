@@ -22,7 +22,7 @@ function sendMulticast() {
       return;
     }
 
-    console.log('broadcasted discover message', msgData);
+    //console.log('broadcasted discover message', msgData);
   });
 }
 
