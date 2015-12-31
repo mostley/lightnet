@@ -43,7 +43,7 @@ module.exports = function(router) {
     .get(function(req, res) {
       console.log('get light ' + req.params.light_id);
 
-      Light.findById(req.params.light_id, function(err, light) {
+      Light.findOne({ id: req.params.light_id }, function(err, light) {
         if (err) {
           console.error(err);
           res.send(err);

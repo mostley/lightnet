@@ -29,7 +29,8 @@ WiFiUDP Udp;
 IPAddress ipMulti(239, 0, 0, 57);
 unsigned int portMulti = 2525;
 
-const char* serverAddress = "";
+String serverAddress = "";
+int serverPort = -1;
 bool hasIP = false;
 bool multicastServerIsStarted = false;
 bool isInitialized = false;
@@ -83,10 +84,14 @@ void loop()
   } else {
     if (!lightIsRegistered()) {
       registerLight();
+      delay(500);
     } else {
       isInitialized = true;
+      delay(500);
     }
   }
+  
+  delay(100);
 }
 
 void startMulticastServer() {
@@ -113,7 +118,7 @@ void handleLEDs() {
 
 void registerLight() {
   Serial.println("> registerLight()");
-  
+  // ESP.getFlashChipId()
 }
 
 bool lightIsRegistered() {
@@ -122,8 +127,22 @@ bool lightIsRegistered() {
   bool result = false;
   
   Serial.println("trying to determine whether the light is already registered");
+
+  int addressLength = serverAddress.length()+1;
+  char address[addressLength];
+  serverAddress.toCharArray(address, addressLength);
   
-  if (client.connect(serverAddress, 80)) {
+  IPAddress remote_addr;
+  int error = WiFi.hostByName(address, remote_addr);
+  if (error) {
+    error = client.connect(remote_addr, serverPort);
+  } else {
+    error = 0;
+    Serial.print("Unable to resolve hostname. ERR: ");
+    Serial.println(error);
+  }
+  
+  if (error) {
     client.print("GET /api/lights/");
     client.print(ESP.getFlashChipId());
     //client.print(system_get_chip_id(),HEX);
@@ -144,8 +163,11 @@ bool lightIsRegistered() {
 
   } else {
     Serial.print("failed to connect to the LightNet Server (");
-    Serial.print(serverAddress);
-    Serial.println(")");
+    Serial.print(address);
+    Serial.print(":");
+    Serial.print(serverPort);
+    Serial.print(") ERR: ");
+    Serial.println(error);
   }
   Serial.print("< ");
   Serial.println(result);
@@ -184,43 +206,39 @@ void listenForServer()
     } // end for
     Serial.println();
 
-    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write("Answer from ESP8266 ChipID#");
-    Udp.print(ESP.getFlashChipId());
-    //ESP.getChipId()
-    Udp.write("#IP of ESP8266#");
-    Udp.println(WiFi.localIP());
-    Udp.endPacket();
-
 
     StaticJsonBuffer<256> jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(received_command);
     
     const char* hostname = root["hostname"];
-    const char* version  = root["version"];
-    const char* name     = root["name"];
+    const char* ip = root["ip"];
+    const char* port = root["port"];
+    const char* name = root["name"];
 
-    if (name == "LightNet") {
+    if (String(name) == "LightNet") {
       Serial.print("Received Server Address for LightNet v");
-      Serial.print(version);
+      Serial.print((const char*)root["version"]);
       Serial.print(" - ");
-      Serial.println(hostname);
+      Serial.print(hostname);
+      Serial.print(":");
+      Serial.println(port);
 
-      serverAddress = hostname;
+      serverAddress = String(ip);
+      serverPort = String(port).toInt();
+    } else {
+      Serial.print("Unknown Discovery Service ");
+      Serial.println(name);
     }
   } // end if
 }
 
 void printWifiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
   Serial.println("===============================");
   Serial.println("========= CHIP INFO ===========");
   Serial.println("===============================");
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+  IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
   Serial.print("AP subnet mask: ");

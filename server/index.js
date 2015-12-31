@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 docs(app, mongoose);
 
-var port = process.env.PORT || 4050;
+var port = process.env.PORT || config.appPort;
 
 // ROUTES
 // =============================================================================
