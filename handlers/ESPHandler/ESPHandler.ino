@@ -18,7 +18,7 @@ extern "C" {  //required for read Vdd Voltage
 
 int status = WL_IDLE_STATUS;
 const char* ssid = "matrix";  //  your network SSID (name)
-const char* pass = "51whc3xt";       // your network password
+const char* pass = "einlangesundtollespasswort";       // your network password
 
 byte packetBuffer[512]; //buffer to hold incoming and outgoing packets
 
@@ -30,57 +30,55 @@ IPAddress ipMulti(239, 0, 0, 57);
 unsigned int portMulti = 2525;
 
 const char* serverAddress = "";
+bool hasIP = false;
+bool multicastServerIsStarted = false;
 bool isInitialized = false;
 WiFiClient client;
 
+
+void WiFiEvent(WiFiEvent_t event) {
+  Serial.println("");
+  Serial.printf("[WiFi-event] event: %d\n", event);
+
+  switch(event) {
+    case WIFI_EVENT_STAMODE_GOT_IP:
+      Serial.println("WiFi connected");
+      hasIP = true;
+      break;
+    case WIFI_EVENT_STAMODE_DISCONNECTED:
+      Serial.println("WiFi lost connection");
+      break;
+  }
+}
 void setup()
 {
-  // Open serial communications and wait for port to open:
   Serial.begin(115200);
-  /*while (!Serial) {
-    ; // wait for serial port to connect.
-  }*/
 
-  // setting up Station AP
-  WiFi.mode(WIFI_STA);
+  WiFi.disconnect(true);
+
+  delay(1000);
+  WiFi.onEvent(WiFiEvent);
   WiFi.begin(ssid, pass);
 
-  // Wait for connect to AP
-  Serial.print("[Connecting]");
-  Serial.print(ssid);
-  int tries=0;
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    tries++;
-    if (tries > 30){
-      break;
-    }
-  }
   Serial.println();
-
-
-  printWifiStatus();
-
-  Serial.println("Connected to wifi");
-
-  if (!Udp.beginMulticast(WiFi.localIP(), ipMulti, portMulti)) {
-  //if (!Udp.begin(portMulti)) {
-    Serial.print("failed to start UDP Server at port ");
-  } else {
-    Serial.print("Udp Multicast server started at : ");
-    Serial.print(ipMulti);
-    Serial.print(":");
-    Serial.println(portMulti);
-  }
+  Serial.println();
+  Serial.println("Wait for WiFi... ");
+  Serial.println();
 }
 
 void loop()
 {
-  if (isInitialized) {
+  if (!hasIP) {
+    Serial.print(".");
+    delay(500);
+  } else if (isInitialized) {
     handleLEDs();
-  } else if (serverAddress == "") {
-    listenForServer();
+  } else if (serverAddress == "") { // has server data received
+    if (multicastServerIsStarted) {
+      startMulticastServer();
+    } else {
+      listenForServer();
+    }
   } else {
     if (!lightIsRegistered()) {
       registerLight();
@@ -90,15 +88,36 @@ void loop()
   }
 }
 
+void startMulticastServer() {
+  Serial.println("> startMulticastServer()");
+  
+  printWifiStatus();
+  
+  if (!Udp.beginMulticast(WiFi.localIP(), ipMulti, portMulti)) {
+    Serial.print("failed to start UDP Server at port ");
+    delay(500);
+  } else {
+    Serial.print("Udp Multicast server started at : ");
+    Serial.print(ipMulti);
+    Serial.print(":");
+    Serial.println(portMulti);
+    multicastServerIsStarted = true;
+  }
+}
+
 void handleLEDs() {
+  Serial.println("> handleLEDs()");
   
 }
 
 void registerLight() {
+  Serial.println("> registerLight()");
   
 }
 
 bool lightIsRegistered() {
+  Serial.println("> lightIsRegistered()");
+  
   bool result = false;
   
   Serial.println("trying to determine whether the light is already registered");
@@ -106,6 +125,7 @@ bool lightIsRegistered() {
   if (client.connect(serverAddress, 80)) {
     client.print("GET /api/lights/");
     client.print(ESP.getFlashChipId());
+    //client.print(system_get_chip_id(),HEX);
     client.println(" HTTP/1.1");
     client.print("Host: ");
     client.println(serverAddress);
@@ -126,12 +146,16 @@ bool lightIsRegistered() {
     Serial.print(serverAddress);
     Serial.println(")");
   }
+  Serial.print("< ");
+  Serial.println(result);
   
   return result;
 }
 
 void listenForServer()
 {
+  Serial.println("> listenForServer()");
+  
   int noBytes = Udp.parsePacket();
   String received_command = "";
 
@@ -161,7 +185,8 @@ void listenForServer()
 
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
     Udp.write("Answer from ESP8266 ChipID#");
-    Udp.print(system_get_chip_id());
+    Udp.print(ESP.getFlashChipId());
+    //ESP.getChipId()
     Udp.write("#IP of ESP8266#");
     Udp.println(WiFi.localIP());
     Udp.endPacket();
@@ -183,8 +208,6 @@ void listenForServer()
       serverAddress = hostname;
     }
   } // end if
-
-
 }
 
 void printWifiStatus() {
@@ -194,8 +217,20 @@ void printWifiStatus() {
 
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
+  Serial.println("===============================");
+  Serial.println("========= CHIP INFO ===========");
+  Serial.println("===============================");
   Serial.print("IP Address: ");
   Serial.println(ip);
-
+  Serial.print("AP subnet mask: ");
+  Serial.println(WiFi.subnetMask());
+  Serial.print("AP gateway: ");
+  Serial.println(WiFi.gatewayIP());
+  Serial.print("Chip ID: ");
+  Serial.println(ESP.getChipId());
+  Serial.print("Flash Chip ID: ");
+  Serial.println(ESP.getFlashChipId());
+  Serial.println("===============================");
   WiFi.printDiag(Serial);
+  Serial.println("===============================");
 }
