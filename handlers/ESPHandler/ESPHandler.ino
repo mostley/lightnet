@@ -1,7 +1,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUDP.h>
+#include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
+#include <WiFiManager.h>
 
 extern "C" {  //required for read Vdd Voltage
 #include "user_interface.h"
@@ -9,6 +11,7 @@ extern "C" {  //required for read Vdd Voltage
 }
 
 // ========== HANDLER INFO ==========
+const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
 const int NUMBER_OF_LIGHTS = 96;
 const char* GEOMETRY = "Cube";
 const int GEOMETRY_WIDTH = 8;
@@ -17,44 +20,23 @@ const int GEOMETRY_LENGTH = 12;
 const int LIGHT_SIZE = 1;
 const char* HANDLER_INFO = "ESP8266-based APA102 Handler";
 const char* VERSION = "1.0.1";
+const char* DNS_POSTFIX = "";
 // ==================================
 
-int status = WL_IDLE_STATUS;
-const char* ssid = "matrix";  //  your network SSID (name)
-const char* pass = "einlangesundtollespasswort";       // your network password
-
-byte packetBuffer[512]; //buffer to hold incoming and outgoing packets
-
-// A UDP instance to let us send and receive packets over UDP
-WiFiUDP Udp;
+byte udpPacketBuffer[512];
 IPAddress ipMulti(239, 0, 0, 57);
 unsigned int portMulti = 2525;
 
 String serverAddress = "";
 int serverPort = -1;
-bool hasIP = false;
 bool multicastServerIsStarted = false;
 bool isInitialized = false;
+
+WiFiUDP Udp;
 
 WiFiClient client;
 
 ESP8266WebServer server(80);
-
-
-void WiFiEvent(WiFiEvent_t event) {
-  Serial.println("");
-  Serial.printf("[WiFi-event] event: %d\n", event);
-
-  switch(event) {
-    case WIFI_EVENT_STAMODE_GOT_IP:
-      Serial.println("WiFi connected");
-      hasIP = true;
-      break;
-    case WIFI_EVENT_STAMODE_DISCONNECTED:
-      Serial.println("WiFi lost connection");
-      break;
-  }
-}
 
 void printWifiStatus() {
   Serial.println("===============================");
@@ -82,16 +64,20 @@ void setup()
 {
   Serial.begin(115200);
 
-  WiFi.disconnect(true);
+  WiFiManager wifiManager;
 
-  delay(1000);
-  WiFi.onEvent(WiFiEvent);
-  WiFi.begin(ssid, pass);
+  String apName = String(AUTOCONFIG_ACCESSPOINT_NAME) + String("_") + String(ESP.getChipId());
+  char apNameBuffer[apName.length()];
+  apName.toCharArray(apNameBuffer, apName.length());
+  
+  if(!wifiManager.autoConnect(apNameBuffer)) {
+    Serial.println("failed to connect to WiFi and hit timeout");
 
-  Serial.println();
-  Serial.println();
-  Serial.println("Wait for WiFi... ");
-  Serial.println();
+    ESP.reset();
+    delay(1000);
+  }
+
+  Serial.println("Connected to WiFi");
 }
 
 void startMulticastServer() {
@@ -221,18 +207,18 @@ bool handlerIsRegistered() {
 
     delay(10);
     String line = client.readStringUntil('\r');
-    Serial.println(line);
+    /*Serial.println(line);
 
     while(client.available()) {
       String line = client.readStringUntil('\r');
       Serial.println(line);
-    }
+    }*/
 
     if (line.startsWith("HTTP/1.1 404 Not Found")) {
       Serial.println("handler not yet registered");
       result = false;
     } else if (line.startsWith("HTTP/1.1 200 OK")) {
-      // TODO check if light count has changed
+      // TODO check if light count has changed and delete existing and reregister if changed
       
       Serial.println("handler already registered");
       result = true;
@@ -265,22 +251,12 @@ void listenForServer()
     Serial.print(Udp.remoteIP());
     Serial.print(":");
     Serial.println(Udp.remotePort());
-    // We've received a packet, read the data from it
-    Udp.read(packetBuffer,noBytes); // read the packet into the buffer
 
-    // display the packet contents in HEX
+    Udp.read(udpPacketBuffer, noBytes);
     for (int i=1;i<=noBytes;i++)
     {
-      Serial.print(packetBuffer[i-1],HEX);
-      received_command = received_command + char(packetBuffer[i - 1]);
-      if (i % 32 == 0)
-      {
-        Serial.println();
-      }
-      else Serial.print(' ');
-    } // end for
-    Serial.println();
-
+      received_command = received_command + char(udpPacketBuffer[i - 1]);
+    }
 
     StaticJsonBuffer<256> jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(received_command);
@@ -300,11 +276,14 @@ void listenForServer()
 
       serverAddress = String(ip);
       serverPort = String(port).toInt();
+
+      Serial.println("Stopping UDP Server");
+      Udp.stop();
     } else {
       Serial.print("Unknown Discovery Service ");
       Serial.println(name);
     }
-  } // end if
+  }
 }
 
 void handleServerRequest() {
@@ -355,6 +334,14 @@ void handleNotFound() {
 }
 
 void startWebServer() {
+  String hostname = String("esp8266_") + String(ESP.getChipId()) + String(DNS_POSTFIX);
+  char hostnameBuffer[hostname.length()];
+  hostname.toCharArray(hostnameBuffer, hostname.length());
+  if (MDNS.begin(hostnameBuffer)) {
+    Serial.print("MDNS responder started. Hostname: ");
+    Serial.println(hostnameBuffer);
+  }
+  
   server.on("/", HTTP_POST, handleServerRequest); 
    server.on("/info", [](){
     Serial.println("> http request /info");
@@ -362,6 +349,7 @@ void startWebServer() {
   });
 
   server.onNotFound(handleNotFound);
+  
   server.begin();
   Serial.println("HTTP server started");
 }
@@ -370,9 +358,6 @@ void loop()
 {
   if (isInitialized) {
     server.handleClient();
-  } else if (!hasIP) {
-    Serial.print(".");
-    delay(500);
   } else if (serverAddress == "") { // has server data received
     if (!multicastServerIsStarted) {
       startMulticastServer();
@@ -387,9 +372,6 @@ void loop()
     } else {
       startWebServer();
       isInitialized = true;
-      delay(500);
     }
   }
-  
-  delay(100);
 }
