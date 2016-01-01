@@ -5,6 +5,9 @@ var Schema       = mongoose.Schema;
 var Vector3 = require('./math/vector3');
 
 var LightSchema   = new Schema({
+    // determines whether or not a light is reachable/controlable at the time (e.g. offline)
+    active: Boolean,
+
     // The ID of the Room the Light is in
     room: String,
 
@@ -37,6 +40,9 @@ var LightSchema   = new Schema({
     handlerGeometryWidth: Number,
     handlerGeometryHeight: Number,
     handlerGeometryLength: Number,
+
+    // The dimension of the light in room units
+    size: Number,
 
     // The index of the Light on the Handler
     index: Number
@@ -74,9 +80,9 @@ LightSchema.methods.updateCoordinates = function () {
 };
 
 LightSchema.methods.updateCubeCoordinates = function () {
-    this.x = this.index % this.handlerGeometry.Width;
-    this.y = Math.floor(this.index / this.handlerGeometry.Width);
-    this.z = Math.floor(this.y / this.handlerGeometry.Length);
+    this.x = (this.index % this.handlerGeometryWidth) * this.size;
+    this.y = (Math.floor(this.index / this.handlerGeometryWidth)) * this.size;
+    this.z = (Math.floor(this.y / this.handlerGeometryLength)) * this.size;
 };
 
 LightSchema.methods.toHandler = function() {
@@ -96,7 +102,7 @@ LightSchema.methods.setColor = function (color) {
     console.log('setting light color for ' + this.toString() + ' to ' + color);
 
     request
-        .post(this.handler)
+        .post("http://" + this.handler + "/")
         .form({
             index: this.index,
             color: color

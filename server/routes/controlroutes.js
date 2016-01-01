@@ -50,47 +50,60 @@ module.exports = function(router) {
     });
 
 
-  router.route('/control/:x/:y/:z?precise=:precise')
+  router.route('/control/:x/:y/:z')
 
     // get the color of the light at those coordinates (GET http://localhost:4020/api/control/:x/:y/:z)
     .get(function(req, res) {
       var pos = new Vector3(req.params.x, req.params.y, req.params.z);
-      var precise = !!req.params.precise;
+      var precise = !!req.query.precise;
       if (!precise) {
         pos.floor();
       }
       console.log('get light color at ' + pos.toString());
 
       if (buffer[pos.x] && buffer[pos.x][pos.y] && buffer[pos.x][pos.y][pos.z]) {
+        console.warn('result: ', buffer[pos.x][pos.y][pos.z]);
         res.json(buffer[pos.x][pos.y][pos.z]);
       } else {
-        res.status(404);
+        console.warn('no light found at that position');
+        res.status(404).send('Not found');
       }
     })
 
     // update the light at those coordinates (PUT http://localhost:4020/api/control/:x/:y/:z?precise=:precise)
     .put(function(req, res) {
-      var pos = new Vector3(req.params.x, req.params.y, req.params.z);
-      var color = req.params.color;
-      var precise = !!req.params.precise;
+      var pos = new Vector3(parseFloat(req.params.x), parseFloat(req.params.y), parseFloat(req.params.z));
+      var precise = !!req.body.precise;
+      var color = [req.body.r, req.body.g, req.body.b];
       if (!precise) {
         pos.floor();
       }
-      console.log('update light color at ' + pos.toString());
+      console.log('update light color at ' + pos.toString() + ' (precise: ' + precise + ') to ', color);
 
+
+      if (!buffer[pos.x]) { buffer[pos.x] = {}; }
+      if (!buffer[pos.x][pos.y]) { buffer[pos.x][pos.y] = {}; }
       buffer[pos.x][pos.y][pos.z] = color;
 
       Light.find(function(err, lights) {
+        console.log(lights.length + " lights in total");
+
         if (err) {
           console.error(err);
           res.send(err);
         }
 
+        var lightCount = 0;
+
         for (var i=0; i<lights.length; i++) {
           if (lights[i].isAt(pos, precise)) {
             lights[i].setColor(color);
+            lightCount++;
           }
+          break;
         };
+
+        res.json({ message: lightCount + ' Lights updated!' });
       });
     });
 

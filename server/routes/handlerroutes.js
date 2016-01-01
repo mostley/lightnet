@@ -23,11 +23,12 @@ module.exports = function(router) {
 
     // create an handler (POST http://localhost:4020/api/handlers)
     .post(function(req, res) {
-      console.log('create an handler',req.body);
+      console.log('create an handler', req.body);
 
       for (var index=0; index<req.body.handlerNumberOfLights; index++) {
         var light = new Light();
         light.index = index;
+        light.size = req.body.lightSize;
         light.handler = req.body.handler;
         light.handlerID = req.body.handlerID;
         light.handlerInfo = req.body.handlerInfo;
@@ -60,7 +61,6 @@ module.exports = function(router) {
     .get(function(req, res) {
       console.log('get handler ' + req.params.handler_id);
 
-      //TODO find out why this does not work
       Light.findOne({ handlerID: req.params.handler_id }, function(err, light) {
         if (err) {
           console.error(err);

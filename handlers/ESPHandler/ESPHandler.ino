@@ -8,6 +8,7 @@
  */
 
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
 #include <WiFiUDP.h>
 #include <ArduinoJson.h>
 
@@ -16,9 +17,16 @@ extern "C" {  //required for read Vdd Voltage
   // uint16 readvdd33(void);
 }
 
+// ========== HANDLER INFO ==========
 const int NUMBER_OF_LIGHTS = 96;
+const char* GEOMETRY = "Cube";
+const int GEOMETRY_WIDTH = 8;
+const int GEOMETRY_HEIGHT = 1;
+const int GEOMETRY_LENGTH = 12;
+const int LIGHT_SIZE = 1;
 const char* HANDLER_INFO = "ESP8266-based APA102 Handler";
-const char* VERSION = "1.0.0";
+const char* VERSION = "1.0.1";
+// ==================================
 
 int status = WL_IDLE_STATUS;
 const char* ssid = "matrix";  //  your network SSID (name)
@@ -36,7 +44,10 @@ int serverPort = -1;
 bool hasIP = false;
 bool multicastServerIsStarted = false;
 bool isInitialized = false;
+
 WiFiClient client;
+
+ESP8266WebServer server(80);
 
 
 void WiFiEvent(WiFiEvent_t event) {
@@ -88,6 +99,7 @@ void loop()
       registerHandler();
       delay(500);
     } else {
+      startWebServer();
       isInitialized = true;
       delay(500);
     }
@@ -147,8 +159,8 @@ int sendHTTPHeader() {
 }
 
 void handleLEDs() {
-  Serial.println("> handleLEDs()");
-  delay(1000); //TODO handle apa
+  //Serial.println("> handleLEDs()");
+  server.handleClient();
 }
 
 int registerHandler() { 
@@ -157,25 +169,25 @@ int registerHandler() {
   int error = 0;
 
   if (connectToAPI()) {
-    StaticJsonBuffer<200> jsonBuffer;
+    StaticJsonBuffer<512> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     char ipstr[26];
     IPAddress ip = WiFi.localIP();
     sprintf(ipstr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
     root["handler"] = ipstr;
-    
     root["handlerID"] = ESP.getFlashChipId();
     root["handlerInfo"] = HANDLER_INFO;
+    root["handlerNumberOfLights"] = NUMBER_OF_LIGHTS;
     root["handlerType"] = 0;
     root["handlerVersion"] = VERSION;
     root["handlerOffsetX"] = 0;
     root["handlerOffsetY"] = 0;
     root["handlerOffsetZ"] = 0;
-    root["handlerGeometry"] = "Cube";
-    root["handlerGeometryWidth"] = 8;
-    root["handlerGeometryHeight"] = 1;
-    root["handlerGeometryLength"] = 12;
-    root["handlerNumberOfLights"] = NUMBER_OF_LIGHTS;
+    root["handlerGeometry"] = GEOMETRY;
+    root["handlerGeometryWidth"] = GEOMETRY_WIDTH;
+    root["handlerGeometryHeight"] = GEOMETRY_HEIGHT;
+    root["handlerGeometryLength"] = GEOMETRY_LENGTH;
+    root["lightSize"] = LIGHT_SIZE;
     
     client.println("POST /api/handlers HTTP/1.1");
     sendHTTPHeader();
@@ -184,6 +196,7 @@ int registerHandler() {
     client.println(root.measureLength());
     client.println();
     root.printTo(client);
+    root.printTo(Serial);
 
     delay(10);
     String line = client.readStringUntil('\r');
@@ -191,7 +204,7 @@ int registerHandler() {
 
     while(client.available()) {
       String line = client.readStringUntil('\r');
-      Serial.print(line);
+      Serial.println(line);
     }
 
     if (line.startsWith("HTTP/1.1 200 OK")) {
@@ -311,6 +324,55 @@ void listenForServer()
       Serial.println(name);
     }
   } // end if
+}
+
+void startWebServer() {
+  server.on("/", HTTP_POST, handleServerRequest); 
+   server.on("/info", [](){
+    server.send(200, "text/plain", String("ESPHandler v") + String(VERSION) + String(" Info: ") + String(HANDLER_INFO));
+  });
+
+  server.onNotFound(handleNotFound);
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void handleServerRequest() {
+  Serial.println("> handleServerRequest()");
+  
+  if(server.args() == 0) {
+    Serial.println("< failed -> no arguments");
+    
+    server.send(500, "text/plain", "BAD ARGS\r\n");
+  }
+  
+  String index = server.arg(0);
+  String color = server.arg(1);
+
+  Serial.print("index: ");
+  Serial.println(index);
+  Serial.print("color: ");
+  Serial.println(color);
+
+  //TODO control lights
+  
+  server.send(200, "text/plain", "done.");
+    Serial.println("< done");
+}
+
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i=0; i<server.args(); i++){
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
 }
 
 void printWifiStatus() {
