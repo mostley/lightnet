@@ -105,7 +105,9 @@ LightSchema.methods.setColor = function (color) {
         .post("http://" + this.handler + "/")
         .form({
             index: this.index,
-            color: color
+            r: color[0],
+            g: color[1],
+            b: color[2]
         })
         .on('error', function(err) {
             console.error(err);

@@ -1,12 +1,3 @@
-/*
- * 31 mar 2015
- * This sketch display UDP packets coming from an UDP client.
- * On a Mac the NC command can be used to send UDP. (nc -u 192.168.1.101 2390).
- *
- * Configuration : Enter the ssid and password of your Wifi AP. Enter the port number your server is listening on.
- *
- */
-
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUDP.h>
@@ -64,6 +55,29 @@ void WiFiEvent(WiFiEvent_t event) {
       break;
   }
 }
+
+void printWifiStatus() {
+  Serial.println("===============================");
+  Serial.println("========= CHIP INFO ===========");
+  Serial.println("===============================");
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+  Serial.print("AP subnet mask: ");
+  Serial.println(WiFi.subnetMask());
+  Serial.print("AP gateway: ");
+  Serial.println(WiFi.gatewayIP());
+  Serial.print("Chip ID: ");
+  Serial.println(ESP.getChipId());
+  Serial.print("Flash Chip ID: ");
+  Serial.println(ESP.getFlashChipId());
+  Serial.println("===============================");
+  WiFi.printDiag(Serial);
+  Serial.println("===============================");
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -78,34 +92,6 @@ void setup()
   Serial.println();
   Serial.println("Wait for WiFi... ");
   Serial.println();
-}
-
-void loop()
-{
-  if (!hasIP) {
-    Serial.print(".");
-    delay(500);
-  } else if (isInitialized) {
-    handleLEDs();
-  } else if (serverAddress == "") { // has server data received
-    if (!multicastServerIsStarted) {
-      startMulticastServer();
-    } else {
-      listenForServer();
-      delay(100);
-    }
-  } else {
-    if (!handlerIsRegistered()) {
-      registerHandler();
-      delay(500);
-    } else {
-      startWebServer();
-      isInitialized = true;
-      delay(500);
-    }
-  }
-  
-  delay(100);
 }
 
 void startMulticastServer() {
@@ -156,11 +142,6 @@ int sendHTTPHeader() {
   client.print("Host: ");
   client.println(serverAddress);
   client.println("Connection: close");
-}
-
-void handleLEDs() {
-  //Serial.println("> handleLEDs()");
-  server.handleClient();
 }
 
 int registerHandler() { 
@@ -326,17 +307,6 @@ void listenForServer()
   } // end if
 }
 
-void startWebServer() {
-  server.on("/", HTTP_POST, handleServerRequest); 
-   server.on("/info", [](){
-    server.send(200, "text/plain", String("ESPHandler v") + String(VERSION) + String(" Info: ") + String(HANDLER_INFO));
-  });
-
-  server.onNotFound(handleNotFound);
-  server.begin();
-  Serial.println("HTTP server started");
-}
-
 void handleServerRequest() {
   Serial.println("> handleServerRequest()");
   
@@ -347,20 +317,29 @@ void handleServerRequest() {
   }
   
   String index = server.arg(0);
-  String color = server.arg(1);
+  String color_r = server.arg(1);
+  String color_g = server.arg(2);
+  String color_b = server.arg(3);
 
   Serial.print("index: ");
   Serial.println(index);
-  Serial.print("color: ");
-  Serial.println(color);
+  Serial.print("color: [");
+  Serial.print(color_r);
+  Serial.print(", ");
+  Serial.print(color_g);
+  Serial.print(", ");
+  Serial.print(color_b);
+  Serial.println("]");
 
   //TODO control lights
   
   server.send(200, "text/plain", "done.");
-    Serial.println("< done");
+  Serial.println("< done");
 }
 
 void handleNotFound() {
+  Serial.println("> handleNotFound()");
+  
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -375,24 +354,42 @@ void handleNotFound() {
   server.send(404, "text/plain", message);
 }
 
-void printWifiStatus() {
-  Serial.println("===============================");
-  Serial.println("========= CHIP INFO ===========");
-  Serial.println("===============================");
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-  Serial.print("AP subnet mask: ");
-  Serial.println(WiFi.subnetMask());
-  Serial.print("AP gateway: ");
-  Serial.println(WiFi.gatewayIP());
-  Serial.print("Chip ID: ");
-  Serial.println(ESP.getChipId());
-  Serial.print("Flash Chip ID: ");
-  Serial.println(ESP.getFlashChipId());
-  Serial.println("===============================");
-  WiFi.printDiag(Serial);
-  Serial.println("===============================");
+void startWebServer() {
+  server.on("/", HTTP_POST, handleServerRequest); 
+   server.on("/info", [](){
+    Serial.println("> http request /info");
+    server.send(200, "text/plain", String("ESPHandler v") + String(VERSION) + String(" Info: ") + String(HANDLER_INFO));
+  });
+
+  server.onNotFound(handleNotFound);
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void loop()
+{
+  if (isInitialized) {
+    server.handleClient();
+  } else if (!hasIP) {
+    Serial.print(".");
+    delay(500);
+  } else if (serverAddress == "") { // has server data received
+    if (!multicastServerIsStarted) {
+      startMulticastServer();
+    } else {
+      listenForServer();
+      delay(100);
+    }
+  } else {
+    if (!handlerIsRegistered()) {
+      registerHandler();
+      delay(500);
+    } else {
+      startWebServer();
+      isInitialized = true;
+      delay(500);
+    }
+  }
+  
+  delay(100);
 }
