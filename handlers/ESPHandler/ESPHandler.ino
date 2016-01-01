@@ -1,3 +1,7 @@
+#define APA102
+//#define WS2812
+//#define WS2801
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUDP.h>
@@ -5,14 +9,33 @@
 #include <ArduinoJson.h>
 #include <WiFiManager.h>
 
+#ifdef APA102
+#include <Adafruit_DotStar.h>
+#include <SPI.h>
+#endif
+
+#ifdef WS2801
+#include "Adafruit_WS2801.h"
+#include <SPI.h>
+#endif
+
+#ifdef WS2812
+#include <Adafruit_NeoPixel.h>
+#endif
+
 extern "C" {  //required for read Vdd Voltage
 #include "user_interface.h"
   // uint16 readvdd33(void);
 }
 
+
+#define NUMPIXELS 60
+
+#define DATAPIN    13 // GPIO15 - MISO
+#define CLOCKPIN   9 // GPIO14 - CLK
+
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
-const int NUMBER_OF_LIGHTS = 96;
 const char* GEOMETRY = "Cube";
 const int GEOMETRY_WIDTH = 8;
 const int GEOMETRY_HEIGHT = 1;
@@ -37,6 +60,20 @@ WiFiUDP Udp;
 WiFiClient client;
 
 ESP8266WebServer server(80);
+
+//TODO use fastled
+
+#ifdef APA102
+Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN);
+#endif
+
+#ifdef WS2812
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, DATAPIN, NEO_GRB + NEO_KHZ800);
+#endif
+
+#ifdef WS2801
+Adafruit_WS2801 strip = Adafruit_WS2801(NUMPIXELS, DATAPIN, CLOCKPIN);
+#endif
 
 void printWifiStatus() {
   Serial.println("===============================");
@@ -144,7 +181,7 @@ int registerHandler() {
     root["handler"] = ipstr;
     root["handlerID"] = ESP.getFlashChipId();
     root["handlerInfo"] = HANDLER_INFO;
-    root["handlerNumberOfLights"] = NUMBER_OF_LIGHTS;
+    root["handlerNumberOfLights"] = NUMPIXELS;
     root["handlerType"] = 0;
     root["handlerVersion"] = VERSION;
     root["handlerOffsetX"] = 0;
@@ -311,6 +348,8 @@ void handleServerRequest() {
   Serial.println("]");
 
   //TODO control lights
+  strip.setPixelColor(index.toInt(), strip.Color(color_r.toInt(), color_g.toInt(), color_b.toInt()));
+  strip.show();
   
   server.send(200, "text/plain", "done.");
   Serial.println("< done");
@@ -352,6 +391,8 @@ void startWebServer() {
   
   server.begin();
   Serial.println("HTTP server started");
+
+  strip.begin();
 }
 
 void loop()
