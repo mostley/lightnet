@@ -1,5 +1,5 @@
-#define APA102
-//#define WS2812
+//#define APA102
+#define WS2812
 //#define WS2801
 
 #include <ESP8266WiFi.h>
@@ -8,6 +8,18 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <WiFiManager.h>
+
+#define D0   16
+#define D1   5
+#define D2   4
+#define D3   0
+#define D4   2
+#define D5   14
+#define D6   12
+#define D7   13
+#define D8   15
+#define D9   3
+#define D10  1
 
 #ifdef APA102
 #include <Adafruit_DotStar.h>
@@ -29,10 +41,10 @@ extern "C" {  //required for read Vdd Voltage
 }
 
 
-#define NUMPIXELS 60
+#define NUMPIXELS 30
 
-#define DATAPIN    13 // GPIO15 - MISO
-#define CLOCKPIN   9 // GPIO14 - CLK
+#define DATAPIN    D2
+#define CLOCKPIN   D5
 
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
@@ -61,7 +73,7 @@ WiFiClient client;
 
 ESP8266WebServer server(80);
 
-//TODO use fastled?
+//TODO use fastled
 
 #ifdef APA102
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN);
@@ -106,7 +118,7 @@ void setup()
   String apName = String(AUTOCONFIG_ACCESSPOINT_NAME) + String("_") + String(ESP.getChipId());
   char apNameBuffer[apName.length()];
   apName.toCharArray(apNameBuffer, apName.length());
-
+  
   if(!wifiManager.autoConnect(apNameBuffer)) {
     Serial.println("failed to connect to WiFi and hit timeout");
 
@@ -119,9 +131,9 @@ void setup()
 
 void startMulticastServer() {
   Serial.println("> startMulticastServer()");
-
+  
   printWifiStatus();
-
+  
   if (!Udp.beginMulticast(WiFi.localIP(), ipMulti, portMulti)) {
     Serial.print("failed to start UDP Server at port ");
     delay(500);
@@ -138,7 +150,7 @@ int connectToAPI() {
   int addressLength = serverAddress.length()+1;
   char address[addressLength];
   serverAddress.toCharArray(address, addressLength);
-
+  
   IPAddress remote_addr;
   int error = WiFi.hostByName(address, remote_addr);
   if (error) {
@@ -147,8 +159,8 @@ int connectToAPI() {
     error = 0;
     Serial.print("Unable to resolve hostname. ERR: ");
     Serial.println(error);
-  }
-
+  } 
+  
   if (!error) {
     Serial.print("failed to connect to the LightNet Server (");
     Serial.print(address);
@@ -167,7 +179,7 @@ int sendHTTPHeader() {
   client.println("Connection: close");
 }
 
-int registerHandler() {
+int registerHandler() { 
   Serial.println("> registerHandler();");
 
   int error = 0;
@@ -192,7 +204,7 @@ int registerHandler() {
     root["handlerGeometryHeight"] = GEOMETRY_HEIGHT;
     root["handlerGeometryLength"] = GEOMETRY_LENGTH;
     root["lightSize"] = LIGHT_SIZE;
-
+    
     client.println("POST /api/handlers HTTP/1.1");
     sendHTTPHeader();
     client.println("Content-Type: application/json; charset=utf-8");
@@ -221,7 +233,7 @@ int registerHandler() {
     client.stop();
 
   }
-
+  
   Serial.print("< ");
   Serial.println(error);
 
@@ -230,9 +242,9 @@ int registerHandler() {
 
 bool handlerIsRegistered() {
   Serial.println("> handlerIsRegistered()");
-
+  
   bool result = false;
-
+  
   Serial.println("trying to determine whether the handler is already registered");
 
   if (connectToAPI()) {
@@ -256,7 +268,7 @@ bool handlerIsRegistered() {
       result = false;
     } else if (line.startsWith("HTTP/1.1 200 OK")) {
       // TODO check if light count has changed and delete existing and reregister if changed
-
+      
       Serial.println("handler already registered");
       result = true;
     } else {
@@ -266,17 +278,17 @@ bool handlerIsRegistered() {
     client.stop();
 
   }
-
+  
   Serial.print("< ");
   Serial.println(result);
-
+  
   return result;
 }
 
 void listenForServer()
 {
   Serial.println("> listenForServer()");
-
+  
   int noBytes = Udp.parsePacket();
   String received_command = "";
 
@@ -297,7 +309,7 @@ void listenForServer()
 
     StaticJsonBuffer<256> jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(received_command);
-
+    
     const char* hostname = root["hostname"];
     const char* ip = root["ip"];
     const char* port = root["port"];
@@ -325,13 +337,13 @@ void listenForServer()
 
 void handleServerRequest() {
   Serial.println("> handleServerRequest()");
-
+  
   if(server.args() == 0) {
     Serial.println("< failed -> no arguments");
-
+    
     server.send(500, "text/plain", "BAD ARGS\r\n");
   }
-
+  
   String index = server.arg(0);
   String color_r = server.arg(1);
   String color_g = server.arg(2);
@@ -350,14 +362,14 @@ void handleServerRequest() {
   //TODO control lights
   strip.setPixelColor(index.toInt(), strip.Color(color_r.toInt(), color_g.toInt(), color_b.toInt()));
   strip.show();
-
+  
   server.send(200, "text/plain", "done.");
   Serial.println("< done");
 }
 
 void handleNotFound() {
   Serial.println("> handleNotFound()");
-
+  
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -380,15 +392,15 @@ void startWebServer() {
     Serial.print("MDNS responder started. Hostname: ");
     Serial.println(hostnameBuffer);
   }
-
-  server.on("/", HTTP_POST, handleServerRequest);
+  
+  server.on("/", HTTP_POST, handleServerRequest); 
    server.on("/info", [](){
     Serial.println("> http request /info");
     server.send(200, "text/plain", String("ESPHandler v") + String(VERSION) + String(" Info: ") + String(HANDLER_INFO));
   });
 
   server.onNotFound(handleNotFound);
-
+  
   server.begin();
   Serial.println("HTTP server started");
 
