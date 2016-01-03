@@ -2,6 +2,7 @@
 
 ArduinoJson - available in the arduino librarymanager or: https://github.com/bblanchon/ArduinoJson
 WiFiManager - https://github.com/tzapu/WiFiManager
+For Dotstar/APA102 - https://github.com/Yona-Appletree/Adafruit_DotStar
 
 # Setup
 
