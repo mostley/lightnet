@@ -1,5 +1,5 @@
-//#define APA102
-#define WS2812
+#define APA102
+//#define WS2812
 //#define WS2801
 
 #include <ESP8266WiFi.h>
@@ -8,18 +8,6 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <WiFiManager.h>
-
-#define D0   16
-#define D1   5
-#define D2   4
-#define D3   0
-#define D4   2
-#define D5   14
-#define D6   12
-#define D7   13
-#define D8   15
-#define D9   3
-#define D10  1
 
 #ifdef APA102
 #include <Adafruit_DotStar.h>
@@ -43,8 +31,8 @@ extern "C" {  //required for read Vdd Voltage
 
 #define NUMPIXELS 1
 
-#define DATAPIN    D2
-#define CLOCKPIN   D5
+#define DATAPIN    13 // GPIO15 - MISO
+#define CLOCKPIN   9 // GPIO14 - CLK
 
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
@@ -113,8 +101,8 @@ void configModeCallback () {
   Serial.println("Entered config mode");
   Serial.println(WiFi.softAPIP());
 
-  for (int i=0; i<NUMPIXELS; i++) {
-    strip.setPixelColor(i), strip.Color(0, 255, 0));
+  for (int i = 0; i < NUMPIXELS; i++) {
+    strip.setPixelColor(i, strip.Color(0, 255, 0));
   }
   strip.show();
 }
@@ -123,8 +111,6 @@ void setup()
 {
   Serial.begin(115200);
 
-  strip.begin();
-
   WiFiManager wifiManager;
 
   String apName = String(AUTOCONFIG_ACCESSPOINT_NAME) + String("_") + String(ESP.getChipId());
@@ -132,16 +118,16 @@ void setup()
   apName.toCharArray(apNameBuffer, apName.length());
 
   wifiManager.setAPCallback(configModeCallback);
-  
-  if(!wifiManager.autoConnect(apNameBuffer)) {
+
+  if (!wifiManager.autoConnect(apNameBuffer)) {
     Serial.println("failed to connect to WiFi and hit timeout");
 
     ESP.reset();
     delay(1000);
   }
 
-  for (int i=0; i<NUMPIXELS; i++) {
-    strip.setPixelColor(i), strip.Color(0, 0, 255));
+  for (int i = 0; i < NUMPIXELS; i++) {
+    strip.setPixelColor(i, strip.Color(0, 0, 255));
   }
   strip.show();
 
@@ -150,9 +136,9 @@ void setup()
 
 void startMulticastServer() {
   Serial.println("> startMulticastServer()");
-  
+
   printWifiStatus();
-  
+
   if (!Udp.beginMulticast(WiFi.localIP(), ipMulti, portMulti)) {
     Serial.print("failed to start UDP Server at port ");
     delay(500);
@@ -166,10 +152,10 @@ void startMulticastServer() {
 }
 
 int connectToAPI() {
-  int addressLength = serverAddress.length()+1;
+  int addressLength = serverAddress.length() + 1;
   char address[addressLength];
   serverAddress.toCharArray(address, addressLength);
-  
+
   IPAddress remote_addr;
   int error = WiFi.hostByName(address, remote_addr);
   if (error) {
@@ -178,8 +164,8 @@ int connectToAPI() {
     error = 0;
     Serial.print("Unable to resolve hostname. ERR: ");
     Serial.println(error);
-  } 
-  
+  }
+
   if (!error) {
     Serial.print("failed to connect to the LightNet Server (");
     Serial.print(address);
@@ -200,9 +186,9 @@ int sendHTTPHeader() {
 
 bool handlerIsRegistered() {
   Serial.println("> handlerIsRegistered()");
-  
+
   bool result = false;
-  
+
   Serial.println("trying to determine whether the handler is already registered");
 
   if (connectToAPI()) {
@@ -220,12 +206,12 @@ bool handlerIsRegistered() {
       result = false;
     } else if (line.startsWith("HTTP/1.1 200 OK")) {
       // TODO check if light count has changed and delete existing and reregister if changed
-      
+
       Serial.println("handler already registered");
       result = true;
     } else {
       Serial.print(line);
-      while(client.available()) {
+      while (client.available()) {
         String line = client.readStringUntil('\r');
         Serial.print(line);
       }
@@ -236,14 +222,14 @@ bool handlerIsRegistered() {
     client.stop();
 
   }
-  
+
   Serial.print("< ");
   Serial.println(result);
-  
+
   return result;
 }
 
-int registerHandler() { 
+int registerHandler() {
   Serial.println("> registerHandler();");
 
   int error = 0;
@@ -268,7 +254,7 @@ int registerHandler() {
     root["handlerGeometryHeight"] = GEOMETRY_HEIGHT;
     root["handlerGeometryLength"] = GEOMETRY_LENGTH;
     root["lightSize"] = LIGHT_SIZE;
-    
+
     client.println("POST /api/handlers HTTP/1.1");
     sendHTTPHeader();
     client.println("Content-Type: application/json; charset=utf-8");
@@ -282,7 +268,7 @@ int registerHandler() {
     String line = client.readStringUntil('\r');
     Serial.println(line);
 
-    while(client.available()) {
+    while (client.available()) {
       String line = client.readStringUntil('\r');
       Serial.println(line);
     }
@@ -296,7 +282,7 @@ int registerHandler() {
 
     client.stop();
   }
-  
+
   Serial.print("< ");
   Serial.println(error);
 
@@ -318,22 +304,50 @@ void getCurrentColor() {
 
     if (line.startsWith("HTTP/1.1 404 Not Found")) {
       Serial.println("light color not found");
-      result = false;
     } else if (line.startsWith("HTTP/1.1 200 OK")) {
       String received_data = "";
-      while(client.available()) {
+      while (client.available()) {
         received_data = received_data + client.readStringUntil('\r');
       }
-      StaticJsonBuffer<256> jsonBuffer;
-      JsonObject& root = jsonBuffer.parseObject(receive);
-      
-      const char* hostname = root["hostname"];
-      const char* ip = root["ip"];
-      const char* port = root["port"];
-      const char* name = root["name"];
+      int contentBodyIndex = received_data.lastIndexOf('\n');
+      String body;
+      if (contentBodyIndex > 0) {
+        body = received_data.substring(contentBodyIndex + 1);
+      }
+      Serial.println("parsing received data:");
+      Serial.print("'");
+      Serial.print(body);
+      Serial.println("'");
+      StaticJsonBuffer<1024> jsonBuffer;
+      JsonObject& root = jsonBuffer.parseObject(body);
+
+      if (!root.success()) {
+        Serial.println("parsing http body failed");
+        client.stop();
+        return;
+      }
+
+      for (JsonObject::iterator it=root.begin(); it!=root.end(); ++it) {
+        int r = it->value[0].as<int>();
+        int g = it->value[1].as<int>();
+        int b = it->value[2].as<int>();
+
+        Serial.print("setting index ");
+        Serial.print(it->key);
+        Serial.print(" to ");
+        Serial.print(r);
+        Serial.print(":");
+        Serial.print(g);
+        Serial.print(":");
+        Serial.println(b);
+
+        strip.setPixelColor(String(it->key).toInt(), strip.Color(r, g, b));
+      }
+
+      strip.show();
     } else {
       Serial.print(line);
-      while(client.available()) {
+      while (client.available()) {
         String line = client.readStringUntil('\r');
         Serial.print(line);
       }
@@ -348,7 +362,7 @@ void getCurrentColor() {
 void listenForServer()
 {
   Serial.println("> listenForServer()");
-  
+
   int noBytes = Udp.parsePacket();
   String received_command = "";
 
@@ -362,14 +376,14 @@ void listenForServer()
     Serial.println(Udp.remotePort());
 
     Udp.read(udpPacketBuffer, noBytes);
-    for (int i=1;i<=noBytes;i++)
+    for (int i = 1; i <= noBytes; i++)
     {
       received_command = received_command + char(udpPacketBuffer[i - 1]);
     }
 
     StaticJsonBuffer<256> jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(received_command);
-    
+
     const char* hostname = root["hostname"];
     const char* ip = root["ip"];
     const char* port = root["port"];
@@ -397,13 +411,13 @@ void listenForServer()
 
 void handleServerRequest() {
   Serial.println("> handleServerRequest()");
-  
-  if(server.args() == 0) {
+
+  if (server.args() == 0) {
     Serial.println("< failed -> no arguments");
-    
+
     server.send(500, "text/plain", "BAD ARGS\r\n");
   }
-  
+
   String index = server.arg(0);
   String color_r = server.arg(1);
   String color_g = server.arg(2);
@@ -419,26 +433,25 @@ void handleServerRequest() {
   Serial.print(color_b);
   Serial.println("]");
 
-  //TODO control lights
   strip.setPixelColor(index.toInt(), strip.Color(color_r.toInt(), color_g.toInt(), color_b.toInt()));
   strip.show();
-  
+
   server.send(200, "text/plain", "done.");
   Serial.println("< done");
 }
 
 void handleNotFound() {
   Serial.println("> handleNotFound()");
-  
+
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i=0; i<server.args(); i++){
+  for (uint8_t i = 0; i < server.args(); i++) {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
@@ -452,15 +465,15 @@ void startWebServer() {
     Serial.print("MDNS responder started. Hostname: ");
     Serial.println(hostnameBuffer);
   }
-  
-  server.on("/", HTTP_POST, handleServerRequest); 
-   server.on("/info", [](){
+
+  server.on("/", HTTP_POST, handleServerRequest);
+  server.on("/info", []() {
     Serial.println("> http request /info");
     server.send(200, "text/plain", String("ESPHandler v") + String(VERSION) + String(" Info: ") + String(HANDLER_INFO));
   });
 
   server.onNotFound(handleNotFound);
-  
+
   server.begin();
   Serial.println("HTTP server started");
 }
@@ -469,6 +482,7 @@ void loop()
 {
   if (isInitialized) {
     server.handleClient();
+    //ESP.wdtDisable();
   } else if (serverAddress == "") { // has server data received
     if (!multicastServerIsStarted) {
       startMulticastServer();
@@ -479,9 +493,9 @@ void loop()
   } else {
     if (!handlerIsRegistered()) {
       registerHandler();
-      getCurrentColor();
       delay(500);
     } else {
+      getCurrentColor();
       startWebServer();
       isInitialized = true;
     }

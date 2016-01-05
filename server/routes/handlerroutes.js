@@ -79,6 +79,7 @@ module.exports = function(router) {
             if (err) {
               console.error(err);
               res.send(err);
+              return;
             }
 
             handler.lightCount = lightCount;
