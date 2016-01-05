@@ -1,5 +1,5 @@
-#define APA102
-//#define WS2812
+//#define APA102
+#define WS2812
 //#define WS2801
 
 #include <ESP8266WiFi.h>
@@ -8,6 +8,18 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <WiFiManager.h>
+
+#define D0   16
+#define D1   5
+#define D2   4
+#define D3   0
+#define D4   2
+#define D5   14
+#define D6   12
+#define D7   13
+#define D8   15
+#define D9   3
+#define D10  1
 
 #ifdef APA102
 #include <Adafruit_DotStar.h>
@@ -31,8 +43,8 @@ extern "C" {  //required for read Vdd Voltage
 
 #define NUMPIXELS 1
 
-#define DATAPIN    13 // GPIO15 - MISO
-#define CLOCKPIN   9 // GPIO14 - CLK
+#define DATAPIN    D2
+#define CLOCKPIN   D5
 
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
@@ -457,7 +469,6 @@ void loop()
 {
   if (isInitialized) {
     server.handleClient();
-    //ESP.wdtDisable();
   } else if (serverAddress == "") { // has server data received
     if (!multicastServerIsStarted) {
       startMulticastServer();
