@@ -29,7 +29,7 @@ extern "C" {  //required for read Vdd Voltage
 }
 
 
-#define NUMPIXELS 60
+#define NUMPIXELS 1
 
 #define DATAPIN    13 // GPIO15 - MISO
 #define CLOCKPIN   9 // GPIO14 - CLK
@@ -37,12 +37,12 @@ extern "C" {  //required for read Vdd Voltage
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
 const char* GEOMETRY = "Cube";
-const int GEOMETRY_WIDTH = 8;
+const int GEOMETRY_WIDTH = 1;
 const int GEOMETRY_HEIGHT = 1;
-const int GEOMETRY_LENGTH = 12;
+const int GEOMETRY_LENGTH = 1;
 const int LIGHT_SIZE = 1;
-const char* HANDLER_INFO = "ESP8266-based APA102 Handler";
-const char* VERSION = "1.0.1";
+const char* HANDLER_INFO = "ESP8266-based WS2812 Handler";
+const char* VERSION = "1.0.2";
 const char* DNS_POSTFIX = "";
 // ==================================
 
@@ -97,15 +97,29 @@ void printWifiStatus() {
   Serial.println("===============================");
 }
 
+void configModeCallback () {
+  Serial.println("Entered config mode");
+  Serial.println(WiFi.softAPIP());
+
+  for (int i=0; i<NUMPIXELS; i++) {
+    strip.setPixelColor(i), strip.Color(0, 255, 0));
+  }
+  strip.show();
+}
+
 void setup()
 {
   Serial.begin(115200);
+
+  strip.begin();
 
   WiFiManager wifiManager;
 
   String apName = String(AUTOCONFIG_ACCESSPOINT_NAME) + String("_") + String(ESP.getChipId());
   char apNameBuffer[apName.length()];
   apName.toCharArray(apNameBuffer, apName.length());
+
+  wifiManager.setAPCallback(configModeCallback);
   
   if(!wifiManager.autoConnect(apNameBuffer)) {
     Serial.println("failed to connect to WiFi and hit timeout");
@@ -113,6 +127,11 @@ void setup()
     ESP.reset();
     delay(1000);
   }
+
+  for (int i=0; i<NUMPIXELS; i++) {
+    strip.setPixelColor(i), strip.Color(0, 0, 255));
+  }
+  strip.show();
 
   Serial.println("Connected to WiFi");
 }
@@ -167,6 +186,51 @@ int sendHTTPHeader() {
   client.println("Connection: close");
 }
 
+bool handlerIsRegistered() {
+  Serial.println("> handlerIsRegistered()");
+  
+  bool result = false;
+  
+  Serial.println("trying to determine whether the handler is already registered");
+
+  if (connectToAPI()) {
+    client.print("GET /api/handlers/");
+    client.print(ESP.getFlashChipId());
+    client.println(" HTTP/1.1");
+    sendHTTPHeader();
+    client.println();
+
+    delay(10);
+    String line = client.readStringUntil('\r');
+
+    if (line.startsWith("HTTP/1.1 404 Not Found")) {
+      Serial.println("handler not yet registered");
+      result = false;
+    } else if (line.startsWith("HTTP/1.1 200 OK")) {
+      // TODO check if light count has changed and delete existing and reregister if changed
+      
+      Serial.println("handler already registered");
+      result = true;
+    } else {
+      Serial.print(line);
+      while(client.available()) {
+        String line = client.readStringUntil('\r');
+        Serial.print(line);
+      }
+      Serial.println("");
+      Serial.println("unrecognized status code or error");
+    }
+
+    client.stop();
+
+  }
+  
+  Serial.print("< ");
+  Serial.println(result);
+  
+  return result;
+}
+
 int registerHandler() { 
   Serial.println("> registerHandler();");
 
@@ -219,7 +283,6 @@ int registerHandler() {
     }
 
     client.stop();
-
   }
   
   Serial.print("< ");
@@ -228,49 +291,46 @@ int registerHandler() {
   return error;
 }
 
-bool handlerIsRegistered() {
-  Serial.println("> handlerIsRegistered()");
-  
-  bool result = false;
-  
-  Serial.println("trying to determine whether the handler is already registered");
+void getCurrentColor() {
+  Serial.println("> getCurrentColor()");
 
   if (connectToAPI()) {
     client.print("GET /api/handlers/");
     client.print(ESP.getFlashChipId());
-    client.println(" HTTP/1.1");
+    client.println("/control HTTP/1.1");
     sendHTTPHeader();
     client.println();
 
     delay(10);
     String line = client.readStringUntil('\r');
-    /*Serial.println(line);
-
-    while(client.available()) {
-      String line = client.readStringUntil('\r');
-      Serial.println(line);
-    }*/
 
     if (line.startsWith("HTTP/1.1 404 Not Found")) {
-      Serial.println("handler not yet registered");
+      Serial.println("light color not found");
       result = false;
     } else if (line.startsWith("HTTP/1.1 200 OK")) {
-      // TODO check if light count has changed and delete existing and reregister if changed
+      String received_data = "";
+      while(client.available()) {
+        received_data = received_data + client.readStringUntil('\r');
+      }
+      StaticJsonBuffer<256> jsonBuffer;
+      JsonObject& root = jsonBuffer.parseObject(receive);
       
-      Serial.println("handler already registered");
-      result = true;
+      const char* hostname = root["hostname"];
+      const char* ip = root["ip"];
+      const char* port = root["port"];
+      const char* name = root["name"];
     } else {
+      Serial.print(line);
+      while(client.available()) {
+        String line = client.readStringUntil('\r');
+        Serial.print(line);
+      }
+      Serial.println("");
       Serial.println("unrecognized status code or error");
     }
 
     client.stop();
-
   }
-  
-  Serial.print("< ");
-  Serial.println(result);
-  
-  return result;
 }
 
 void listenForServer()
@@ -391,14 +451,13 @@ void startWebServer() {
   
   server.begin();
   Serial.println("HTTP server started");
-
-  strip.begin();
 }
 
 void loop()
 {
   if (isInitialized) {
     server.handleClient();
+    //ESP.wdtDisable();
   } else if (serverAddress == "") { // has server data received
     if (!multicastServerIsStarted) {
       startMulticastServer();
@@ -409,6 +468,7 @@ void loop()
   } else {
     if (!handlerIsRegistered()) {
       registerHandler();
+      getCurrentColor();
       delay(500);
     } else {
       startWebServer();
