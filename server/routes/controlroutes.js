@@ -36,6 +36,7 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
         for (var i=0; i<lights.length; i++) {
@@ -91,6 +92,7 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
         var lightCount = 0;
@@ -104,6 +106,102 @@ module.exports = function(router) {
         };
 
         res.json({ message: lightCount + ' Lights updated!' });
+      });
+    });
+
+
+  router.route('/lights/:light_id/control')
+
+    // get the effective color of the light by ID (GET http://localhost:4020/api/lights/:light_id/control)
+    .get(function(req, res) {
+      console.log('get control light ' + req.params.light_id);
+
+      Light.findById(req.params.light_id, function(err, light) {
+        if (err) {
+          console.error(err);
+          res.send(err);
+          return;
+        }
+
+        var pos = light.getVector();
+
+        var color = [0, 0, 0];
+        if (buffer[pos.x] && buffer[pos.x][pos.y] && buffer[pos.x][pos.y][pos.z] && buffer[pos.x][pos.y][pos.z]) {
+          color = buffer[pos.x][pos.y][pos.z];
+        } else {
+          pos.floor();
+          if (buffer[pos.x] && buffer[pos.x][pos.y] && buffer[pos.x][pos.y][pos.z] && buffer[pos.x][pos.y][pos.z]) {
+            color = buffer[pos.x][pos.y][pos.z];
+          }
+        }
+
+        res.json(color);
+      });
+    })
+
+    // update the light by ID (PUT http://localhost:4020/api/lights/:light_id/control)
+    .put(function(req, res) {
+      var color = [req.body.r, req.body.g, req.body.b];
+      var precise = !!req.body.precise;
+      console.log('control light ' + req.params.light_id);
+
+      Light.findById(req.params.light_id, function(err, light) {
+        if (err) {
+          console.error(err);
+          res.send(err);
+          return;
+        }
+
+        var pos = light.getVector();
+        if (!precise) {
+          pos.floor();
+        }
+
+        if (!buffer[pos.x]) { buffer[pos.x] = {}; }
+        if (!buffer[pos.x][pos.y]) { buffer[pos.x][pos.y] = {}; }
+        buffer[pos.x][pos.y][pos.z] = color;
+
+        light.setColor(color);
+
+        res.json({ message: 'Light updated!' });
+      });
+    });
+
+
+  router.route('/handlers/:handler_id/control')
+
+    // get the effective color of every light by handler ID (GET http://localhost:4020/api/lights/:light_id/control)
+    .get(function(req, res) {
+      console.log('get control handler ' + req.params.handler_id);
+
+      Light.find({ handlerID: req.params.handler_id }, function(err, lights) {
+        if (err) {
+          console.error(err);
+          res.send(err);
+          return;
+        }
+
+        var colors = {};
+
+        for (var i in lights) {
+          var light = lights[i];
+
+          var pos = light.getVector();
+
+          var color = [0, 0, 0];
+          if (buffer[pos.x] && buffer[pos.x][pos.y] && buffer[pos.x][pos.y][pos.z] && buffer[pos.x][pos.y][pos.z]) {
+            color = buffer[pos.x][pos.y][pos.z];
+          } else {
+            pos.floor();
+            if (buffer[pos.x] && buffer[pos.x][pos.y] && buffer[pos.x][pos.y][pos.z] && buffer[pos.x][pos.y][pos.z]) {
+              color = buffer[pos.x][pos.y][pos.z];
+            }
+          }
+
+          colors[light.index] = color;
+        }
+
+        res.json(colors);
       });
     });
 

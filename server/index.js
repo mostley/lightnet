@@ -9,6 +9,7 @@ var controlRoutes = require('./routes/controlroutes');
 var handlerRoutes = require('./routes/handlerroutes');
 var discoverer = require('./discoverer');
 var pinger = require('./pinger');
+var lightcleaner = require('./lightcleaner');
 
 // SETUP
 // =============================================================================
@@ -34,6 +35,14 @@ var port = process.env.PORT || config.appPort;
 // =============================================================================
 var router = express.Router();
 
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+  next();
+});
+
 router.get('/', function(req, res) {
   console.log('route / hit');
   res.json({ message: 'Welcome to the LightNet. A LabNet Service provided to you by FabLab Karlsruhe e.V.' });
@@ -58,3 +67,8 @@ discoverer();
 // START TCP Light Handler Pinging
 // =============================================================================
 pinger();
+
+// START Cleanup Task for old inactive lights
+// =============================================================================
+lightcleaner();
+

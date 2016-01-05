@@ -5,21 +5,25 @@ module.exports = function(router) {
 
   router.route('/handlers')
 
+    // TODO figure out how this is possible with mongoose
     // get handlers (GET http://localhost:4020/api/handlers)
-    .get(function(req, res) {
+    /*.get(function(req, res) {
       console.log('get handlers');
 
-      Light.distinct('handlerID', function(err, lights) {
+      Light.find(function(err, lights) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
+
+        console.log(lights);
 
         var handlers = lights.map(function(light) { return light.toHandler(); });
 
         res.json(handlers);
       });
-    })
+    })*/
 
     // create an handler (POST http://localhost:4020/api/handlers)
     .post(function(req, res) {
@@ -29,6 +33,7 @@ module.exports = function(router) {
         var light = new Light();
         light.index = index;
         light.size = req.body.lightSize;
+        light.active = true;
         light.handler = req.body.handler;
         light.handlerID = req.body.handlerID;
         light.handlerInfo = req.body.handlerInfo;
@@ -65,6 +70,7 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
         if (light) {

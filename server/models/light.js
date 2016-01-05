@@ -7,6 +7,7 @@ var Vector3 = require('./math/vector3');
 var LightSchema   = new Schema({
     // determines whether or not a light is reachable/controlable at the time (e.g. offline)
     active: Boolean,
+    deactivated: Date,
 
     // The ID of the Room the Light is in
     room: String,
@@ -48,6 +49,29 @@ var LightSchema   = new Schema({
     index: Number
 });
 
+
+LightSchema.methods.setData = function(data) {
+    this.active = data.active;
+    this.room = data.room;
+    this.x = data.x;
+    this.y = data.y;
+    this.z = data.z;
+    this.handler = data.handler;
+    this.handlerID = data.handlerID;
+    this.handlerInfo = data.handlerInfo;
+    this.handlerType = data.handlerType;
+    this.handlerVersion = data.handlerVersion;
+    this.handlerOffsetX = data.handlerOffsetX;
+    this.handlerOffsetY = data.handlerOffsetY;
+    this.handlerOffsetZ = data.handlerOffsetZ;
+    this.handlerGeometry = data.handlerGeometry;
+    this.handlerGeometryWidth = data.handlerGeometryWidth;
+    this.handlerGeometryHeight = data.handlerGeometryHeight;
+    this.handlerGeometryLength = data.handlerGeometryLength;
+    this.size = data.size;
+    this.index = data.index;
+};
+
 LightSchema.methods.toString = function () {
     return '[ ' + this.x + ':' + this.y + ':' + this.z + ' - ' + this.handler + '(' + this.index + ') ]'
 };
@@ -87,8 +111,8 @@ LightSchema.methods.updateCubeCoordinates = function () {
 
 LightSchema.methods.toHandler = function() {
     return {
-        ipAddress: this.handler,
         id: this.handlerID,
+        ipAddress: this.handler,
         info: this.handlerInfo,
         type: this.handlerType,
         version: this.handlerVersion,

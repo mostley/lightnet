@@ -4,7 +4,7 @@ module.exports = function(router) {
 
   router.route('/lights')
 
-    // get lights (GET http://localhost:4020/api/lights)
+    // get lights (GET http://localhost:4050/api/lights)
     .get(function(req, res) {
       console.log('get lights');
 
@@ -12,24 +12,28 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
+
+        console.log(lights.length + ' lights found.');
 
         res.json(lights);
       });
     })
 
 
-    // create a light (POST http://localhost:4020/api/lights)
+    // create a light (POST http://localhost:4050/api/lights)
     .post(function(req, res) {
       console.log('create light');
 
       var light = new Light();
-      light.name = req.body.name;
+      light.setData(req.body);
 
       light.save(function(err) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
         res.json({ message: 'Light created!' });
@@ -39,7 +43,7 @@ module.exports = function(router) {
 
   router.route('/lights/:light_id')
 
-    // get the light with that id (GET http://localhost:4020/api/lights/:light_id)
+    // get the light with that id (GET http://localhost:4050/api/lights/:light_id)
     .get(function(req, res) {
       console.log('get light ' + req.params.light_id);
 
@@ -47,6 +51,7 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
         if (light) {
@@ -58,7 +63,7 @@ module.exports = function(router) {
       });
     })
 
-    // update the light with this id (PUT http://localhost:4020/api/lights/:light_id)
+    // update the light with this id (PUT http://localhost:4050/api/lights/:light_id)
     .put(function(req, res) {
       console.log('update light ' + req.params.light_id);
 
@@ -67,14 +72,16 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
-        light.name = req.body.name;
+        light.setData(req.body);
 
         light.save(function(err) {
           if (err) {
             console.error(err);
             res.send(err);
+          return;
           }
 
           res.json({ message: 'Light updated!' });
@@ -83,7 +90,7 @@ module.exports = function(router) {
       });
     })
 
-    // delete the light with this id (DELETE http://localhost:4020/api/lights/:light_id)
+    // delete the light with this id (DELETE http://localhost:4050/api/lights/:light_id)
     .delete(function(req, res) {
       console.log('delete light ' + req.params.light_id);
 
@@ -93,6 +100,7 @@ module.exports = function(router) {
         if (err) {
           console.error(err);
           res.send(err);
+          return;
         }
 
         res.json({ message: 'Successfully deleted' });
