@@ -111,6 +111,8 @@ LightSchema.methods.updateCoordinates = function () {
 
 LightSchema.methods.updateCubeCoordinates = function () {
     if (this.handlerGeometryDirection1 === '-xx' && this.handlerGeometryDirection2 === 'yy' && this.handlerGeometryDirection3 === 'zz') {
+        console.log("using snaking: ", this.handlerGeometryDirection1, this.handlerGeometryDirection2, this.handlerGeometryDirection3);
+
         this.y = (Math.floor(this.index / this.handlerGeometryWidth) % this.handlerGeometryHeight) * this.size;
         this.x = (this.index % this.handlerGeometryWidth) * this.size;
         if (this.y % 2 === 0) {
@@ -122,6 +124,8 @@ LightSchema.methods.updateCubeCoordinates = function () {
             this.z = this.handlerGeometryHeight - 1;
         }
     } else {
+        console.log("using fallback snaking: ", this.handlerGeometryDirection1, this.handlerGeometryDirection2, this.handlerGeometryDirection3);
+
         this.x = (this.index % this.handlerGeometryWidth) * this.size;
 
         this.y = (Math.floor(this.index / this.handlerGeometryWidth) % this.handlerGeometryHeight) * this.size;
