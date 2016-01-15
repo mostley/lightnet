@@ -41,7 +41,7 @@ extern "C" {  //required for read Vdd Voltage
 }
 
 
-#define NUMPIXELS 1
+#define NUMPIXELS 20
 
 #define DATAPIN    D2
 #define CLOCKPIN   D5
@@ -49,11 +49,14 @@ extern "C" {  //required for read Vdd Voltage
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
 const char* GEOMETRY = "Cube";
-const int GEOMETRY_WIDTH = 1;
-const int GEOMETRY_HEIGHT = 1;
+const int GEOMETRY_WIDTH = 5;
+const int GEOMETRY_HEIGHT = 4;
 const int GEOMETRY_LENGTH = 1;
+const char* GEOMETRY_DIRECTION_1 = "-xx";
+const char* GEOMETRY_DIRECTION_2 = "yy";
+const char* GEOMETRY_DIRECTION_3 = "zz";
 const int LIGHT_SIZE = 1;
-const char* HANDLER_INFO = "ESP8266-based WS2812 Handler";
+const char* HANDLER_INFO = "M4t3l1ght";
 const char* VERSION = "1.0.2";
 const char* DNS_POSTFIX = "";
 // ==================================
@@ -265,6 +268,10 @@ int registerHandler() {
     root["handlerGeometryWidth"] = GEOMETRY_WIDTH;
     root["handlerGeometryHeight"] = GEOMETRY_HEIGHT;
     root["handlerGeometryLength"] = GEOMETRY_LENGTH;
+    root["handlerGeometryDirection1"] = GEOMETRY_DIRECTION_1;
+    root["handlerGeometryDirection2"] = GEOMETRY_DIRECTION_2;
+    root["handlerGeometryDirection3"] = GEOMETRY_DIRECTION_3;
+    
     root["lightSize"] = LIGHT_SIZE;
 
     client.println("POST /api/handlers HTTP/1.1");

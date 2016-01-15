@@ -41,6 +41,9 @@ var LightSchema   = new Schema({
     handlerGeometryWidth: Number,
     handlerGeometryHeight: Number,
     handlerGeometryLength: Number,
+    handlerGeometryDirection1: Number,
+    handlerGeometryDirection2: Number,
+    handlerGeometryDirection3: Number,
 
     // The dimension of the light in room units
     size: Number,
@@ -68,6 +71,9 @@ LightSchema.methods.setData = function(data) {
     this.handlerGeometryWidth = data.handlerGeometryWidth;
     this.handlerGeometryHeight = data.handlerGeometryHeight;
     this.handlerGeometryLength = data.handlerGeometryLength;
+    this.handlerGeometryDirection1 = data.handlerGeometryDirection1;
+    this.handlerGeometryDirection2 = data.handlerGeometryDirection2;
+    this.handlerGeometryDirection3 = data.handlerGeometryDirection3;
     this.size = data.size;
     this.index = data.index;
 };
@@ -104,9 +110,18 @@ LightSchema.methods.updateCoordinates = function () {
 };
 
 LightSchema.methods.updateCubeCoordinates = function () {
-    this.x = (this.index % this.handlerGeometryWidth) * this.size;
-    this.y = (Math.floor(this.index / this.handlerGeometryWidth)) * this.size;
-    this.z = (Math.floor(this.y / this.handlerGeometryLength)) * this.size;
+    if (this.handlerGeometryDirection1 === '-xx') {
+        this.y = (Math.floor(this.index / this.handlerGeometryWidth)) * this.size;
+        this.x = (this.index % this.handlerGeometryWidth) * this.size;
+        if (this.y % 2 === 0) {
+            this.x = (this.handlerGeometryWidth - 1) - this.x;
+        }
+        this.z = (Math.floor(this.y / this.handlerGeometryLength)) * this.size;
+    } else {
+        this.x = (this.index % this.handlerGeometryWidth) * this.size;
+        this.y = (Math.floor(this.index / this.handlerGeometryWidth)) * this.size;
+        this.z = (Math.floor(this.y / this.handlerGeometryLength)) * this.size;
+    }
 };
 
 LightSchema.methods.toHandler = function() {
@@ -118,7 +133,13 @@ LightSchema.methods.toHandler = function() {
         version: this.handlerVersion,
         offsetX: this.handlerOffsetX,
         offsetY: this.handlerOffsetY,
-        offsetZ: this.handlerOffsetZ
+        offsetZ: this.handlerOffsetZ,
+        GeometryWidth: this.handlerGeometryWidth,
+        GeometryHeight: this.handlerGeometryHeight,
+        GeometryLength: this.handlerGeometryLength,
+        GeometryDirection1: this.handlerGeometryDirection1,
+        GeometryDirection2: this.handlerGeometryDirection2,
+        GeometryDirection3: this.handlerGeometryDirection3
     };
 };
 
