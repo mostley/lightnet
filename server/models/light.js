@@ -111,25 +111,25 @@ LightSchema.methods.updateCoordinates = function () {
 
 LightSchema.methods.updateCubeCoordinates = function () {
     if (this.handlerGeometryDirection1 === '-xx' && this.handlerGeometryDirection2 === 'yy' && this.handlerGeometryDirection3 === 'zz') {
-        this.y = (Math.floor(this.index / this.handlerGeometryWidth)) * this.size;
+        this.y = (Math.floor(this.index / this.handlerGeometryWidth) % this.handlerGeometryHeight) * this.size;
         this.x = (this.index % this.handlerGeometryWidth) * this.size;
         if (this.y % 2 === 0) {
             this.x = (this.handlerGeometryWidth - 1) - this.x;
         }
-        if (this.handlerGeometryLength > this.y) {
-            this.z = (Math.floor(this.y / this.handlerGeometryLength)) * this.size;
+        if (this.handlerGeometryHeight > this.y) {
+            this.z = (Math.floor(this.y / this.handlerGeometryHeight)) * this.size;
         } else {
-            this.z = this.handlerGeometryLength - 1;
+            this.z = this.handlerGeometryHeight - 1;
         }
     } else {
         this.x = (this.index % this.handlerGeometryWidth) * this.size;
 
-        this.y = (Math.floor(this.index / this.handlerGeometryWidth)) * this.size;
+        this.y = (Math.floor(this.index / this.handlerGeometryWidth) % this.handlerGeometryHeight) * this.size;
 
-        if (this.handlerGeometryLength > this.y) {
-            this.z = (Math.floor(this.y / this.handlerGeometryLength)) * this.size;
+        if (this.handlerGeometryHeight > this.y) {
+            this.z = (Math.floor(this.y / this.handlerGeometryHeight)) * this.size;
         } else {
-            this.z = this.handlerGeometryLength - 1;
+            this.z = this.handlerGeometryHeight - 1;
         }
     }
 };
