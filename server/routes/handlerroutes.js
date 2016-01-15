@@ -46,6 +46,9 @@ module.exports = function(router) {
         light.handlerGeometryWidth = req.body.handlerGeometryWidth;
         light.handlerGeometryHeight = req.body.handlerGeometryHeight;
         light.handlerGeometryLength = req.body.handlerGeometryLength;
+        light.handlerGeometryDirection1 = req.body.handlerGeometryDirection1;
+        light.handlerGeometryDirection2 = req.body.handlerGeometryDirection2;
+        light.handlerGeometryDirection3 = req.body.handlerGeometryDirection3;
 
         light.updateCoordinates();
 
