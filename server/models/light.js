@@ -41,9 +41,9 @@ var LightSchema   = new Schema({
     handlerGeometryWidth: Number,
     handlerGeometryHeight: Number,
     handlerGeometryLength: Number,
-    handlerGeometryDirection1: Number,
-    handlerGeometryDirection2: Number,
-    handlerGeometryDirection3: Number,
+    handlerGeometryDirection1: String,
+    handlerGeometryDirection2: String,
+    handlerGeometryDirection3: String,
 
     // The dimension of the light in room units
     size: Number,
