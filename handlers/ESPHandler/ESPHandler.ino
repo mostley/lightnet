@@ -49,12 +49,12 @@ extern "C" {  //required for read Vdd Voltage
 // ========== HANDLER INFO ==========
 const char* AUTOCONFIG_ACCESSPOINT_NAME = "LightHandlerConfigAP";
 const char* GEOMETRY = "Cube";
-const int GEOMETRY_WIDTH = 5;
-const int GEOMETRY_HEIGHT = 4;
-const int GEOMETRY_LENGTH = 1;
+const int GEOMETRY_WIDTH = 5; // x
+const int GEOMETRY_HEIGHT = 4; // y
+const int GEOMETRY_LENGTH = 1; // z
 const char* GEOMETRY_DIRECTION_1 = "-xx";
-const char* GEOMETRY_DIRECTION_2 = "yy";
-const char* GEOMETRY_DIRECTION_3 = "zz";
+const char* GEOMETRY_DIRECTION_2 = "zz";
+const char* GEOMETRY_DIRECTION_3 = "yy";
 const int LIGHT_SIZE = 1;
 const char* HANDLER_INFO = "M4t3l1ght";
 const char* VERSION = "1.0.2";
