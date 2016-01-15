@@ -1,7 +1,6 @@
 FROM node:4.2
 
-EXPOSE 4050
-EXPOSE 2525/udp
+EXPOSE 4060
 
 WORKDIR /src
 
