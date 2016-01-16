@@ -1,4 +1,4 @@
-var apiUrl = 'http://lightnet:4050/api/';
+var apiUrl = 'http://labnet:4050/api/';
 var pollingInterval = 5000;
 
 var lights = {};
