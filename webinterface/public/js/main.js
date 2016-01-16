@@ -1,4 +1,4 @@
-var apiUrl = 'http://192.168.1.6:4050/api/';
+var apiUrl = 'http://lightnet:4050/api/';
 var pollingInterval = 5000;
 
 var lights = {};
