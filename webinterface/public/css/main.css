@@ -1,3 +1,11 @@
+body {
+  padding-top: 70px;
+}
+
+#navbar a {
+  border-radius: 0;
+}
+
 .sidebar {
   display: none;
 }

@@ -16,10 +16,11 @@
 </head>
 <body>
 
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
@@ -27,50 +28,91 @@
         </button>
         <a class="navbar-brand" href="#">LightNet</a>
       </div>
-      <div id="navbar" class="navbar-collapse collapse">
-      </div>
-    </div>
-  </nav>
 
-  <div class="jumbotron">
-    <div class="container">
-      <h1>LightNet Webinterface</h1>
-      <p></p>
-    </div>
-  </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul id="navbar" class="nav navbar-nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#lights" aria-controls="lights" role="tab" data-toggle="tab">Lights</a></li>
+          <li role="presentation"><a href="#rooms" aria-controls="rooms" role="tab" data-toggle="tab">Rooms</a></li>
+          <li role="presentation"><a href="#lightsources" aria-controls="lightsources" role="tab" data-toggle="tab">Lightsources</a></li>
+          <li role="presentation"><a href="#animations" aria-controls="animations" role="tab" data-toggle="tab">Animations</a></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
 
   <div class="container">
 
-    <div class="row">
+    <div class="tab-content">
 
-      <div class="col-sm-3 col-md-2 sidebar">
-        <h3 class="sub-header">Handlers</h3>
+      <div role="tabpanel" class="tab-pane active" id="lights">
 
-        <ul id="handlerlist" class="nav nav-sidebar">
-          <li class="active"><a href="#">All Lights <span class="sr-only">(current)</span></a></li>
-        </ul>
-      </div>
+        <div class="row">
 
-      <div class="col-sm-9 col-md-10 main">
-        <h3 class="sub-header">Lights</h3>
+          <div class="col-sm-3 col-md-2 sidebar">
+            <h3 class="sub-header">Handlers</h3>
 
-        <div class="table-responsive">
-          <table id="lightlist" class="table table-striped">
-            <thead>
-              <tr>
-                <th>X:Y:Z</th>
-                <th>Room</th>
-                <th>Index</th>
-                <th>Handler</th>
-                <th>Active</th>
-                <th>Control</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+            <ul id="handlerlist" class="nav nav-sidebar">
+              <li class="active"><a href="#">All Lights <span class="sr-only">(current)</span></a></li>
+            </ul>
+          </div>
+
+          <div class="col-sm-9 col-md-10 main">
+            <h3 class="sub-header">Lights</h3>
+
+            <div class="table-responsive">
+              <table id="lightlist" class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>X:Y:Z</th>
+                    <th>Room</th>
+                    <th>Index</th>
+                    <th>Handler</th>
+                    <th>Active</th>
+                    <th>Control</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div role="tabpanel" class="tab-pane" id="rooms">
+
+        <div class="row">
+
+          <div class="col-sm-3 col-md-2 sidebar">
+            <h3 class="sub-header">Rooms</h3>
+
+            <ul id="roomlist" class="nav nav-sidebar">
+            </ul>
+          </div>
+
+          <div class="col-sm-9 col-md-10 main">
+            <h3 id="roomTitle" class="sub-header">Room</h3>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="lightsources">
+
+        <div class="row">
+        </div>
+
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="animations">
+
+        <div class="row">
+        </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -78,5 +120,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/lights.js"></script>
+  <script src="js/rooms.js"></script>
 </body>
 </html>
