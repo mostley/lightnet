@@ -7,6 +7,8 @@ var config = require('./config');
 var lightRoutes = require('./routes/lightroutes');
 var controlRoutes = require('./routes/controlroutes');
 var handlerRoutes = require('./routes/handlerroutes');
+var roomRoutes = require('./routes/roomroutes');
+var animationRoutes = require('./routes/animationroutes');
 var discoverer = require('./discoverer');
 var pinger = require('./pinger');
 var lightcleaner = require('./lightcleaner');
@@ -51,6 +53,8 @@ router.get('/', function(req, res) {
 lightRoutes(router);
 controlRoutes(router);
 handlerRoutes(router);
+roomRoutes(router);
+animationRoutes(router);
 
 // REGISTER ROUTES -------------------------------
 app.use('/api', router);

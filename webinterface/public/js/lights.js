@@ -1,6 +1,7 @@
 function LightManager() {
   this.lights = {};
   this.handlers = {};
+  this.timer = -1;
 }
 
 LightManager.prototype.setLight = function (id, r, g, b) {
@@ -138,7 +139,7 @@ LightManager.prototype.onData = function (lightList) {
     }
   }
 
-  window.setTimeout(this.requestData.bind(this), Lightnet.pollingInterval);
+  this.timer = window.setTimeout(this.requestData.bind(this), Lightnet.pollingInterval);
 };
 
 LightManager.prototype.requestData = function () {
@@ -148,7 +149,21 @@ LightManager.prototype.requestData = function () {
     dataType: "json",
     success: this.onData.bind(this),
     error: function(xhr, textStatus, error) {
-      window.setTimeout(me.requestData.bind(me), Lightnet.pollingInterval);
+      console.log('[LightManager] ' + error);
+
+      this.timer = window.setTimeout(me.requestData.bind(me), Lightnet.pollingInterval);
     }
   });
-}
+};
+
+LightManager.prototype.activate = function() {
+  console.log('[LightManager] activate');
+
+  this.requestData();
+};
+
+LightManager.prototype.deactivate = function() {
+  console.log('[LightManager] deactivate');
+
+  window.clearTimeout(this.timer);
+};
