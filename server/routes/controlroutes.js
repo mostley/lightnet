@@ -2,8 +2,79 @@ var Light = require('../models/light');
 var Vector3 = require('../models/math/vector3');
 
 var buffer = {};
+var lightsources = {};
+var lightsourceIdCounter = 0;
 
 module.exports = function(router) {
+
+  router.route('/lightsources')
+
+    // get control (GET http://localhost:4020/api/lightsources)
+    .get(function(req, res) {
+      console.log('get lightsources');
+
+      res.json(lightsources);
+    })
+
+
+    // create a lightsource (POST http://localhost:4020/api/lightsources)
+    .post(function(req, res) {
+      console.log('create lightsource');
+
+      var lightsource = Object.assign(res.body, {
+        id: lightsourceIdCounter++,
+        p: [0, 0, 0],
+        r: 1,
+        s: 1,
+        c: [0, 0, 0]
+      });
+
+      lightsources[lightsource.id] = lightsource;
+    });
+
+
+  router.route('/lightsources/:lightsource_id')
+
+    // get the lightsource with that id (GET http://localhost:4050/api/lightsources/:lightsource_id)
+    .get(function(req, res) {
+      console.log('get lightsource ' + req.params.lightsource_id);
+
+      var result = lightsources[res.params.lightsource_id];
+      if (!result) {
+        res.status(404).send("Not Found!");
+      } else {
+        res.json(result);
+      }
+    })
+
+    // update the lightsource with this id (PUT http://localhost:4050/api/lightsources/:lightsource_id)
+    .put(function(req, res) {
+      console.log('update lightsource ' + req.params.lightsource_id);
+
+      var lightsource = lightsources[res.params.lightsource_id];
+
+      if (!result) {
+        res.status(404).send("Not Found!");
+      } else {
+        lightsources[res.params.lightsource_id] = Object.assign(lightsource, res.body);
+        res.json({ message: 'successfully updated' });
+      }
+    })
+
+    // delete the lightsource with this id (DELETE http://localhost:4050/api/lightsources/:lightsource_id)
+    .delete(function(req, res) {
+      console.log('delete lightsource ' + req.params.lightsource_id);
+
+      var lightsource = lightsources[res.params.lightsource_id];
+
+      if (!result) {
+        res.status(404).send("Not Found!");
+      } else {
+        delete lightsources[res.params.lightsource_id];
+        res.json({ message: 'Successfully deleted' });
+      }
+    });
+
 
   router.route('/control')
 
