@@ -1,9 +1,11 @@
 var Lightnet = {
   apiUrl: 'http://localhost:4050/api/',
   pollingInterval: 5000,
+  activeManager: null,
   lightManager: null,
   roomManager: null,
-  activeManager: null
+  lightsourceManager: null,
+  animationManager: null
 };
 
 function activateManager(mgr) {
@@ -21,6 +23,7 @@ $(function() {
 
   Lightnet.lightManager = new LightManager();
   Lightnet.roomManager = new RoomManager();
+  Lightnet.lightsourceManager = new LightsourceManager();
 
   $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     window.location.hash = e.target.hash;
@@ -29,6 +32,10 @@ $(function() {
       activateManager(Lightnet.lightManager);
     } else if (e.target.hash == '#rooms') {
       activateManager(Lightnet.roomManager);
+    } else if (e.target.hash == '#lightsources') {
+      activateManager(Lightnet.lightsourceManager);
+    } else if (e.target.hash == '#animations') {
+      activateManager(Lightnet.animationManager);
     } else if (Lightnet.activeManager) {
       Lightnet.activeManager.deactivate();
     }
@@ -39,4 +46,7 @@ $(function() {
   } else {
     activateManager(Lightnet.lightManager);
   }
+
+  $('.colorpicker-element').colorpicker();
+  $('.slider').slider();
 });

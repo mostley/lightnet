@@ -43,7 +43,7 @@ extern "C" {  //required for read Vdd Voltage
 
 #define NUMPIXELS 20
 
-#define DATAPIN    D2
+#define DATAPIN    D2 // D7 for SPI
 #define CLOCKPIN   D5
 
 // ========== HANDLER INFO ==========
@@ -52,12 +52,12 @@ const char* GEOMETRY = "Cube";
 const int GEOMETRY_WIDTH = 5; // x
 const int GEOMETRY_HEIGHT = 4; // y
 const int GEOMETRY_LENGTH = 1; // z
-const char* GEOMETRY_DIRECTION_1 = "-xx";
+const char* GEOMETRY_DIRECTION_1 = "xx";
 const char* GEOMETRY_DIRECTION_2 = "yy";
 const char* GEOMETRY_DIRECTION_3 = "zz";
 const int LIGHT_SIZE = 1;
-const char* HANDLER_INFO = "M4t3l1ght";
-const char* VERSION = "1.0.2";
+const char* HANDLER_INFO = "96handheld";
+const char* VERSION = "1.0.3";
 const char* DNS_POSTFIX = "";
 // ==================================
 
@@ -77,7 +77,7 @@ WiFiClient client;
 ESP8266WebServer server(80);
 
 #ifdef APA102
-Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN);
+Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 #endif
 
 #ifdef WS2812

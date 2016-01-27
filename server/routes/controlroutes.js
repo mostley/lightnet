@@ -21,7 +21,7 @@ module.exports = function(router) {
     .post(function(req, res) {
       console.log('create lightsource');
 
-      var lightsource = Object.assign(res.body, {
+      var lightsource = Object.assign(req.body, {
         id: lightsourceIdCounter++,
         p: [0, 0, 0],
         r: 1,
@@ -39,7 +39,7 @@ module.exports = function(router) {
     .get(function(req, res) {
       console.log('get lightsource ' + req.params.lightsource_id);
 
-      var result = lightsources[res.params.lightsource_id];
+      var result = lightsources[req.params.lightsource_id];
       if (!result) {
         res.status(404).send("Not Found!");
       } else {
@@ -51,12 +51,12 @@ module.exports = function(router) {
     .put(function(req, res) {
       console.log('update lightsource ' + req.params.lightsource_id);
 
-      var lightsource = lightsources[res.params.lightsource_id];
+      var lightsource = lightsources[req.params.lightsource_id];
 
       if (!result) {
         res.status(404).send("Not Found!");
       } else {
-        lightsources[res.params.lightsource_id] = Object.assign(lightsource, res.body);
+        lightsources[req.params.lightsource_id] = Object.assign(lightsource, req.body);
         res.json({ message: 'successfully updated' });
       }
     })
@@ -65,12 +65,12 @@ module.exports = function(router) {
     .delete(function(req, res) {
       console.log('delete lightsource ' + req.params.lightsource_id);
 
-      var lightsource = lightsources[res.params.lightsource_id];
+      var lightsource = lightsources[req.params.lightsource_id];
 
       if (!result) {
         res.status(404).send("Not Found!");
       } else {
-        delete lightsources[res.params.lightsource_id];
+        delete lightsources[req.params.lightsource_id];
         res.json({ message: 'Successfully deleted' });
       }
     });

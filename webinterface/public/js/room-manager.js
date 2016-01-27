@@ -157,7 +157,6 @@ RoomManager.prototype.resizeAndRedrawCanvas = function ()
 {
   var desiredWidth = $('#roomOutlineContainer').width();
   var desiredHeight = $('#roomOutlineContainer').height();
-  console.log(desiredWidth, desiredHeight);
 
   $('#roomOutlineCanvas')
     .width(desiredWidth)
