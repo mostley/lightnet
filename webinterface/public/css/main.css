@@ -57,7 +57,7 @@ body {
     margin-top: 0;
 }
 
-#roomOutlineContainer {
+.room-outline-container {
     border: 1px solid black;
     width: 100%;
     height: 100%;
@@ -82,4 +82,8 @@ body {
     width: 20px;
     text-align: right;
     display: inline-block;
+}
+
+#lightsourcesPage, #lightsourceRoomOutlineContainer, #lightsource-editor {
+    position: relative;
 }

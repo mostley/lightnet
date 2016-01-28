@@ -1,4 +1,9 @@
 <div class="row">
+    <ul id="room-tab-list" class="nav nav-tabs" role="tablist">
+    </ul>
+</div>
+
+<div id="lightsourcesPage" class="row">
 
     <div class="col-sm-4 col-md-3 sidebar">
         <div class="well">
@@ -13,41 +18,44 @@
 
         <div class="well">
             <form>
-                <h5>No Source selected</h5>
+                <h4 id="sourceName">No Source selected</h4><br/>
 
-                <div class="form-group">
-                    <label>Position</label>
-                    <div class="input-group">
-                        <span class="label label-default">X</span>
-                        <span id="sourcePositionXOutput" class="position-indicator">0</span>
+                <div id="lightsource-editor">
 
-                        <span class="label label-default">Y</span>
-                        <span id="sourcePositionYOutput" class="position-indicator">0</span>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <div class="input-group">
+                            <span class="label label-default">X</span>
+                            <span id="sourcePositionXOutput" class="position-indicator">0</span>
 
-                        <span class="label label-default">Z</span>
-                        <span id="sourcePositionZOutput" class="position-indicator">0</span>
+                            <span class="label label-default">Y</span>
+                            <span id="sourcePositionYOutput" class="position-indicator">0</span>
+
+                            <span class="label label-default">Z</span>
+                            <span id="sourcePositionZOutput" class="position-indicator">0</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Color</label>
-                    <div class="input-group colorpicker-component colorpicker-element">
-                        <input id="sourceColorInput" type="text" value="#000000" class="form-control">
-                        <span class="input-group-addon"><i></i></span>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <div id="sourceColorInput" class="input-group colorpicker-component colorpicker-element">
+                            <input type="text" value="#000000" class="form-control">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Radius</label>
-                    <div class="input-group">
-                        <input id="radiusInput" class="slider" data-slider-id="radiusInput" type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.05" data-slider-value="1"/>
+                    <div class="form-group">
+                        <label>Radius</label>
+                        <div class="input-group">
+                            <input id="radiusInput" class="slider" data-slider-id="radiusInput" type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.05" data-slider-value="1"/>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Softness</label>
-                    <div class="input-group">
-                        <input id="softnessInput" class="slider" data-slider-id="softnessInput" type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.05" data-slider-value="1"/>
+                    <div class="form-group">
+                        <label>Softness</label>
+                        <div class="input-group">
+                            <input id="softnessInput" class="slider" data-slider-id="softnessInput" type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.05" data-slider-value="1"/>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -55,11 +63,8 @@
     </div>
 
     <div class="col-sm-8 col-md-9 main">
-        <ul id="room-tab-list" class="nav nav-tabs" role="tablist">
-        </ul>
-
-        <div class="col-sm-9 col-md-10" id="roomOutlineContainer">
-            <canvas id="roomOutlineCanvas" resize></canvas>
+        <div class="col-sm-9 col-md-10 room-outline-container" id="lightsourceRoomOutlineContainer">
+            <canvas id="lightsourceRoomOutlineCanvas" resize></canvas>
         </div>
     </div>
 

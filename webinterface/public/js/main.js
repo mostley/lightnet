@@ -48,5 +48,12 @@ $(function() {
   }
 
   $('.colorpicker-element').colorpicker();
-  $('.slider').slider();
+
+  $.fn.shroud.defaults = {
+    opacity: .8,
+    z: 1000,
+    color: '#fff',
+    speed: 200,
+    click: false
+  };
 });
