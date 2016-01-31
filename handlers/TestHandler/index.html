@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LightNet Test Handler</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/toastr.min.css" rel="stylesheet">
+    <link href="css/voxel.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container-fluid main-container">
+      <div class="row">
+        <div class="col-xs-3 col-md-3">
+          <div id="sidebar-handler-info" class="fancy-panel well">
+            <form>
+              <div class="form-group">
+                <label for="handlerIDField">ID</label>
+                <input type="text" class="form-control" id="handlerIDField" value="TestHandlerID-1" />
+              </div>
+              <div class="form-group">
+                <label for="handlerIPField">IP</label>
+                <input type="text" class="form-control" id="handlerIPField" placeholder="IP" value="127.0.0.1" />
+              </div>
+              <div class="form-group">
+                <label for="handlerInfoField">Info</label>
+                <textarea class="form-control" id="handlerInfoField" placeholder="Info">Handler to test the stuff</textarea>
+              </div>
+              <div class="form-group">
+                <label for="handlerTypeField">Type</label>
+                <select class="form-control" id="handlerTypeField">
+                  <option value="0">JSON over TCP</option>
+                  <option value="1">OSC over UDP</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="handlerVersionField">Version</label>
+                <input type="text" class="form-control" id="handlerVersionField" value="1.0.0"/>
+              </div>
+              <div class="form-group">
+                <label>Offset</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="handlerOffsetXField" value="0" style="width: 33.3%" />
+                  <input type="text" class="form-control" id="handlerOffsetYField" value="0" style="width: 33.3%" />
+                  <input type="text" class="form-control" id="handlerOffsetZField" value="0" style="width: 33.3%" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="handlerLightCountField">Number of Lights</label>
+                <input type="text" class="form-control" id="handlerLightCountField" value="1" />
+              </div>
+              <div class="form-group">
+                <label for="handlerLightSizeField">LightSize</label>
+                <input type="text" class="form-control" id="handlerLightSizeField" value="1" />
+              </div>
+              <div class="form-group">
+                <label for="handlerGeometryField">Geometry</label>
+                <select class="form-control" id="handlerGeometryField">
+                  <option value="cube">Cube</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Dimension</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="handlerWidthField" value="1" style="width: 33.3%" />
+                  <input type="text" class="form-control" id="handlerHeightField" value="1" style="width: 33.3%" />
+                  <input type="text" class="form-control" id="handlerLengthField" value="1" style="width: 33.3%" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Direction (Snaking)</label>
+                <div class="input-group" style="width: 100%">
+                  <select class="form-control" id="handlerDirection1Field" style="width: 33.3%; padding: 5px;">
+                    <option value="xx">XX</option>
+                    <option value="-xx">-XX</option>
+                    <option value="x-x">X-X</option>
+                    <option value="-x-x">-X-X</option>
+                  </select>
+                  <select class="form-control" id="handlerDirection2Field" style="width: 33.3%; padding: 5px;">
+                    <option value="yy">YY</option>
+                    <option value="-yy">-YY</option>
+                    <option value="y-y">Y-Y</option>
+                    <option value="-y-y">-Y-Y</option>
+                  </select>
+                  <select class="form-control" id="handlerDirection3Field" style="width: 33.3%; padding: 5px;">
+                    <option value="zz">ZZ</option>
+                    <option value="-zz">-ZZ</option>
+                    <option value="z-z">Z-Z</option>
+                    <option value="-z-z">-Z-Z</option>
+                  </select>
+                </div>
+              </div>
+              <button id="registerHandlerBtn" type="submit" class="btn btn-default" style="width: 100%">Register</button>
+              <button id="readHandlerBtn" type="submit" class="btn btn-default" style="width: 100%">Read</button>
+              <button id="updateHandlerBtn" type="submit" class="btn btn-default" style="width: 100%">Update</button>
+              <button id="deleteHandlerBtn" type="submit" class="btn btn-default" style="width: 100%">Delete</button>
+            </form>
+          </div>
+
+          <div id="sidebar-handler-controls" class="fancy-panel well">
+            test
+          </div>
+        </div>
+
+        <div id="main-container" class="col-xs-9 col-md-9">
+          <div id="light-container" class="well fancy-panel">
+            <div class="message">not yet registered</div>
+          </div>
+          <div id="log-container" class="well fancy-panel">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="node_modules/nw-dev/lib/dev.js"></script>
+    <script type="text/javascript" src="js/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="js/toastr.min.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/voxel.js"></script>
+    <script type="text/javascript" src="lightnet.js"></script>
+    <script type="text/javascript" src="handler.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+  </body>
+</html>

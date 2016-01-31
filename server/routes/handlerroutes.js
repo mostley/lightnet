@@ -93,6 +93,36 @@ module.exports = function(router) {
           res.status(404).send('Not found');
         }
       });
+    })
+
+    // update the handler with that id (PUT http://localhost:4020/api/handlers/:handler_id)
+    .put(function(req, res) {
+      console.log('update handler ' + req.params.handler_id, req.body);
+
+      Light.update({ handlerID: req.params.handler_id }, { $set: req.body }, function(err, result) {
+        if (err) {
+          console.error(err);
+          res.send(err);
+          return;
+        }
+
+        res.json({ message: 'handler successfully updated.' });
+      });
+    })
+
+    // delete the handler with that id (DELETE http://localhost:4020/api/handlers/:handler_id)
+    .delete(function(req, res) {
+      console.log('delete handler ' + req.params.handler_id);
+
+      Light.find({ handlerID: req.params.handler_id }).remove(function(err, result) {
+        if (err) {
+          console.error(err);
+          res.send(err);
+          return;
+        }
+
+        res.json({ message: 'handler successfully removed.' });
+      });
     });
 
 };

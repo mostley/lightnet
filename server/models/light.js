@@ -99,8 +99,8 @@ LightSchema.methods.isAt = function (position, precise) {
 };
 
 LightSchema.methods.updateCoordinates = function () {
-    switch (this.handlerGeometry) {
-        case "Cube":
+    switch (this.handlerGeometry.toLowerCase()) {
+        case "cube":
             this.updateCubeCoordinates();
             break;
         default:
@@ -136,6 +136,14 @@ LightSchema.methods.updateCubeCoordinates = function () {
             this.z = this.handlerGeometryHeight - 1;
         }
     }
+
+    /*console.log('[updateCubeCoordinates] ',
+        ' index: ', this.index,
+        ' size: ', this.size,
+        ' x: ', this.x, ' y: ', this.y, ' z: ', this.z,
+        ' width: ', this.handlerGeometryWidth,
+        ' height: ', this.handlerGeometryHeight,
+        ' length: ', this.handlerGeometryLength);*/
 };
 
 LightSchema.methods.toHandler = function() {
