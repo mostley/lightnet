@@ -31,6 +31,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 docs(app, mongoose);
 
+var expressWs = require('express-ws')(app);
+
 var port = process.env.PORT || config.appPort;
 
 // ROUTES
@@ -50,13 +52,13 @@ router.get('/', function(req, res) {
   res.json({ message: 'Welcome to the LightNet. A LabNet Service provided to you by FabLab Karlsruhe e.V.' });
 });
 
-lightRoutes(router);
-controlRoutes(router);
-handlerRoutes(router);
-roomRoutes(router);
-animationRoutes(router);
+lightRoutes(router, app, expressWs);
+controlRoutes(router, app, expressWs);
+handlerRoutes(router, app, expressWs);
+roomRoutes(router, app, expressWs);
+animationRoutes(router, app, expressWs);
 
-// REGISTER ROUTES -------------------------------
+// REGISTER ROUTES -------------------------------------------------------------
 app.use('/api', router);
 
 // START SERVER
