@@ -7,7 +7,7 @@ function LightManager() {
 LightManager.prototype.setLight = function (id, r, g, b) {
   console.log('setLight(' + id + ',' + r + ',' + g + ',' + b + ')');
 
-  $.ajax(apiUrl + 'lights/' + id + '/control', {
+  $.ajax(Lightnet.apiUrl + 'lights/' + id + '/control', {
     method: 'PUT',
     data: { r: r, g: g, b: b },
     success: function(result) {
@@ -20,15 +20,17 @@ LightManager.prototype.setLight = function (id, r, g, b) {
 }
 
 LightManager.prototype.createLightRow = function (light) {
+  var me = this;
+
   var row = $('<tr id="lightrow_' + light._id + '"></tr>');
   var red_button = $('<button type="button" class="btn btn-default">Red</button>');
-  $(red_button).click(function() { this.setLight(light._id, 255, 0, 0); });
+  $(red_button).click(function() { me.setLight(light._id, 255, 0, 0); });
   var green_button = $('<button type="button" class="btn btn-default">Green</button>');
-  $(red_button).click(function() { this.setLight(light._id, 0, 255, 0); });
+  $(green_button).click(function() { me.setLight(light._id, 0, 255, 0); });
   var blue_button = $('<button type="button" class="btn btn-default">Blue</button>');
-  $(red_button).click(function() { this.setLight(light._id, 0, 0, 255); });
+  $(blue_button).click(function() { me.setLight(light._id, 0, 0, 255); });
   var off_button = $('<button type="button" class="btn btn-default">Off</button>');
-  $(red_button).click(function() { this.setLight(light._id, 0, 0, 0); });
+  $(off_button).click(function() { me.setLight(light._id, 0, 0, 0); });
   var buttons = $('<div class="btn-group" role="group"></div>');
   buttons.append(red_button).append(green_button).append(blue_button).append(off_button);
 
