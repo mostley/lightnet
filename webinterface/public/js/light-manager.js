@@ -2,6 +2,7 @@ function LightManager() {
   this.lights = {};
   this.handlers = {};
   this.timer = -1;
+  this.filteredHandler = null;
 }
 
 LightManager.prototype.setLight = function (id, r, g, b) {
@@ -11,7 +12,7 @@ LightManager.prototype.setLight = function (id, r, g, b) {
     method: 'PUT',
     data: { r: r, g: g, b: b },
     success: function(result) {
-      toastr["success"](result.message);
+      //toastr["success"](result.message);
     },
     error: function() {
       toastr["error"]("I failed to control this light, sorry");
@@ -23,16 +24,19 @@ LightManager.prototype.createLightRow = function (light) {
   var me = this;
 
   var row = $('<tr id="lightrow_' + light._id + '"></tr>');
-  var red_button = $('<button type="button" class="btn btn-default">Red</button>');
-  $(red_button).click(function() { me.setLight(light._id, 255, 0, 0); });
-  var green_button = $('<button type="button" class="btn btn-default">Green</button>');
-  $(green_button).click(function() { me.setLight(light._id, 0, 255, 0); });
-  var blue_button = $('<button type="button" class="btn btn-default">Blue</button>');
-  $(blue_button).click(function() { me.setLight(light._id, 0, 0, 255); });
+  var change_button = $('<a href="#" class="btn small demo colorpicker-element">change</a>');
+
+  change_button.colorpicker({
+      color: '#000'
+    }).on('changeColor', function(ev) {
+      var color = ev.color.toRGB();
+      me.setLight(light._id, color.r, color.g, color.b);
+    });
+
   var off_button = $('<button type="button" class="btn btn-default">Off</button>');
   $(off_button).click(function() { me.setLight(light._id, 0, 0, 0); });
   var buttons = $('<div class="btn-group" role="group"></div>');
-  buttons.append(red_button).append(green_button).append(blue_button).append(off_button);
+  buttons.append(change_button).append(off_button);
 
   row.append('<td>' + light.x + ':' + light.y + ':' + light.z + '</td>');
   row.append('<td>' + (light.room || '-') + '</td>');
@@ -47,21 +51,44 @@ LightManager.prototype.createLightRow = function (light) {
 LightManager.prototype.appendLightToTable = function (light) {
   var row = this.createLightRow(light);
   $('#lightlist tbody').append(row);
-}
+};
 
 LightManager.prototype.updateLightInTable = function (light) {
   console.log('[updateLightInTable]', light);
 
   $('#lightrow_' + light._id).replaceWith(this.createLightRow(light));
-}
+};
 
 LightManager.prototype.appendHandlerToList = function (handler) {
+  var me = this;
+
   var name = handler.id + ' - ' + handler.ipAddress;
   var tooltip = 'version: ' + handler.version + ' type: ' + handler.type + ' offset: ('
     + handler.offsetX + ':' + handler.offsetY + ':' + handler.offsetZ + ') info: ' + handler.info;
 
-  $('#handlerlist').append('<li id="handleritem_' + handler.id + '" title="' + tooltip + '"><a href="#">' + name + '</a></li>')
-}
+  var handlerLink = $('<li id="handleritem_' + handler.id + '" data-handler-id="' + handler.id + '" title="' + tooltip + '"><a href="#">' + name + '</a></li>');
+  handlerLink.on('click', function() {
+    var handlerId = $(this).data('handler-id');
+    if ($(this).hasClass('all-lights')) {
+      me.filterHandlerList(null);
+    } else {
+      me.filterHandlerList(handlerId);
+    }
+
+    return false;
+  });
+
+  $('#handlerlist').append(handlerLink);
+};
+
+LightManager.prototype.filterHandlerList = function(handlerId) {
+  console.log('[LightManager] filterHandlerList', handlerId);
+
+  $('#handleritem_' + this.filteredHandler).removeClass('active');
+  $('#handleritem_' + handlerId).addClass('active');
+  this.filteredHandler = handlerId;
+  this.requestData();
+};
 
 LightManager.prototype.lightEquals = function (lightA, lightB) {
   var result = lightA.x === lightB.x && lightA.y === lightB.y && lightA.z === lightB.z &&
@@ -79,7 +106,15 @@ LightManager.prototype.getValues = function (obj) {
 };
 
 LightManager.prototype.onData = function (lightList) {
+  var me = this;
+
   if (!lightList) { return; }
+
+  var completeLightList = lightList;
+
+  if (this.filteredHandler) {
+    lightList = lightList.filter(function(light) { return light.handlerID == me.filteredHandler; });
+  }
 
   var lightsToDelete = this.getValues(this.lights).filter(function(light) {
     var result = true;
@@ -94,8 +129,8 @@ LightManager.prototype.onData = function (lightList) {
 
   var handlersToDelete = this.getValues(this.handlers).filter(function(handler) {
     var result = true;
-    for (var i in lightList) {
-      if (lightList[i].handlerID === handler.id) {
+    for (var i in completeLightList) {
+      if (completeLightList[i].handlerID === handler.id) {
         result = false;
         break;
       }
@@ -112,7 +147,6 @@ LightManager.prototype.onData = function (lightList) {
     delete this.handlers[handlersToDelete[i].id];
     $('#handleritem_' + handlersToDelete[i].id).remove();
   }
-
 
   for (var i in lightList) {
     var light = lightList[i];

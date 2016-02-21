@@ -9,7 +9,6 @@
     "height": 768
   },
   "dependencies": {
-    "appjs-win32": "0.0.19",
     "nw": "^0.12.3"
   },
   "devDependencies": {
