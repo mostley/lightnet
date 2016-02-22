@@ -1,5 +1,5 @@
 var Lightnet = {
-  apiUrl: 'http://localhost:4050/api/',
+  apiUrl: 'http://server:4050/api/',
   pollingInterval: 5000,
   activeManager: null,
   lightManager: null,

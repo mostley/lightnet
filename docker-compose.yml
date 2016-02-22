@@ -1,0 +1,17 @@
+server:
+  build: server/.
+  ports:
+   - "4050:4050"
+   - "2525/udp:2525/udp"
+  links:
+   - mongo
+webinterface:
+  build: webinterface/.
+  ports:
+   - "4060:4060"
+  links:
+   - server
+mongo:
+  image: mongo
+  ports:
+   - "27017:27017"
