@@ -14,6 +14,7 @@ gulp.task('docker-machine:start', ['server:build'], function(cb) {
   exec('docker-machine start lightnet', function (err, stdout, stderr) {
     console.log(stdout);
     console.error(stderr);
+
     cb(err);
   });
 });
