@@ -172,6 +172,8 @@ Matrix4.prototype = {
     var c = Math.cos( y ), d = Math.sin( y );
     var e = Math.cos( z ), f = Math.sin( z );
 
+    var ce, cf, de, df, ac, ad, bc, bd, ae, af, be, bf;
+
     if ( euler.order === 'XYZ' ) {
 
       var ae = a * e, af = a * f, be = b * e, bf = b * f;
@@ -190,7 +192,7 @@ Matrix4.prototype = {
 
     } else if ( euler.order === 'YXZ' ) {
 
-      var ce = c * e, cf = c * f, de = d * e, df = d * f;
+      ce = c * e, cf = c * f, de = d * e, df = d * f;
 
       te[ 0 ] = ce + df * b;
       te[ 4 ] = de * b - cf;
@@ -206,7 +208,7 @@ Matrix4.prototype = {
 
     } else if ( euler.order === 'ZXY' ) {
 
-      var ce = c * e, cf = c * f, de = d * e, df = d * f;
+      ce = c * e, cf = c * f, de = d * e, df = d * f;
 
       te[ 0 ] = ce - df * b;
       te[ 4 ] = - a * f;
@@ -222,7 +224,7 @@ Matrix4.prototype = {
 
     } else if ( euler.order === 'ZYX' ) {
 
-      var ae = a * e, af = a * f, be = b * e, bf = b * f;
+      ae = a * e, af = a * f, be = b * e, bf = b * f;
 
       te[ 0 ] = c * e;
       te[ 4 ] = be * d - af;
@@ -238,7 +240,7 @@ Matrix4.prototype = {
 
     } else if ( euler.order === 'YZX' ) {
 
-      var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+      ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
       te[ 0 ] = c * e;
       te[ 4 ] = bd - ac * f;
@@ -254,7 +256,7 @@ Matrix4.prototype = {
 
     } else if ( euler.order === 'XZY' ) {
 
-      var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+      ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
       te[ 0 ] = c * e;
       te[ 4 ] = - f;
@@ -556,35 +558,35 @@ Matrix4.prototype = {
     return (
       n41 * (
         + n14 * n23 * n32
-         - n13 * n24 * n32
-         - n14 * n22 * n33
-         + n12 * n24 * n33
-         + n13 * n22 * n34
-         - n12 * n23 * n34
+        - n13 * n24 * n32
+        - n14 * n22 * n33
+        + n12 * n24 * n33
+        + n13 * n22 * n34
+        - n12 * n23 * n34
       ) +
       n42 * (
         + n11 * n23 * n34
-         - n11 * n24 * n33
-         + n14 * n21 * n33
-         - n13 * n21 * n34
-         + n13 * n24 * n31
-         - n14 * n23 * n31
+        - n11 * n24 * n33
+        + n14 * n21 * n33
+        - n13 * n21 * n34
+        + n13 * n24 * n31
+        - n14 * n23 * n31
       ) +
       n43 * (
         + n11 * n24 * n32
-         - n11 * n22 * n34
-         - n14 * n21 * n32
-         + n12 * n21 * n34
-         + n14 * n22 * n31
-         - n12 * n24 * n31
+        - n11 * n22 * n34
+        - n14 * n21 * n32
+        + n12 * n21 * n34
+        + n14 * n22 * n31
+        - n12 * n24 * n31
       ) +
       n44 * (
         - n13 * n22 * n31
-         - n11 * n23 * n32
-         + n11 * n22 * n33
-         + n13 * n21 * n32
-         - n12 * n21 * n33
-         + n12 * n23 * n31
+        - n11 * n23 * n32
+        + n11 * n22 * n33
+        + n13 * n21 * n32
+        - n12 * n21 * n33
+        + n12 * n23 * n31
       )
 
     );

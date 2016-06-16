@@ -12,10 +12,10 @@ LightManager.prototype.setLight = function (id, r, g, b) {
     method: 'PUT',
     data: { r: r, g: g, b: b },
     success: function(result) {
-      //toastr["success"](result.message);
+      //toastr.success(result.message);
     },
     error: function() {
-      toastr["error"]("I failed to control this light, sorry");
+      toastr.error("I failed to control this light, sorry");
     }
   });
 }

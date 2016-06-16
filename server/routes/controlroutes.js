@@ -149,7 +149,7 @@ module.exports = function(router, app, expressWs) {
             light.setColor(color);
             broadcastLightChange({ lightId: light.id, color: color });
           }
-        };
+        }
       });
 
     });
@@ -209,7 +209,7 @@ module.exports = function(router, app, expressWs) {
             lightCount++;
           }
           break;
-        };
+        }
 
         res.json({ message: lightCount + ' Lights updated!' });
       });

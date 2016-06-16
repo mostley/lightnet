@@ -1,8 +1,0 @@
-open tty.SLAB_USBtoUART
-put common.py
-put pixel.py
-put config.py
-put main.py
-put server.py
-put socketutil.py
-ls

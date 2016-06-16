@@ -79,7 +79,7 @@ LightSchema.methods.setData = function(data) {
 };
 
 LightSchema.methods.toString = function () {
-    return '[ ' + this.x + ':' + this.y + ':' + this.z + ' - ' + this.handler + '(' + this.index + ') ]'
+    return '[ ' + this.x + ':' + this.y + ':' + this.z + ' - ' + this.handler + '(' + this.index + ') ]';
 };
 
 LightSchema.methods.getHandlerOffset = function () {

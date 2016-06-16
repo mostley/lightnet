@@ -7,13 +7,11 @@ var Maths = require('./maths');
 var Quaternion = require('./quaternion');
 
 function Euler ( x, y, z, order ) {
-
   this._x = x || 0;
   this._y = y || 0;
   this._z = z || 0;
   this._order = order || Euler.DefaultOrder;
-
-};
+}
 
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
@@ -217,9 +215,7 @@ Euler.prototype = {
       }
 
     } else {
-
-      console.warn( 'Euler: .setFromRotationMatrix() given unsupported order: ' + order )
-
+      console.warn('Euler: .setFromRotationMatrix() given unsupported order: ' + order);
     }
 
     this._order = order;

@@ -10,6 +10,12 @@ function setLightActiveByHandler(handler, active) {
       return;
     }
 
+    var onSaveCallback = function(err, light) {
+      if (err) {
+        console.error(err);
+      }
+    };
+
     for (var i in lights) {
       var light = lights[i];
       if (light.active !== active) {
@@ -19,11 +25,7 @@ function setLightActiveByHandler(handler, active) {
           light.deactivated = new Date();
         }
 
-        light.save(function(err, light) {
-          if (err) {
-            console.error(err);
-          }
-        });
+        light.save(onSaveCallback);
       }
     }
   });

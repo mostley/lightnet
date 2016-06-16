@@ -29,6 +29,12 @@ module.exports = function(router) {
     .post(function(req, res) {
       console.log('create an handler', req.body);
 
+      var onSaveCallback = function(err, light) {
+        if (err) {
+          console.error(err);
+        }
+      };
+
       for (var index=0; index<req.body.handlerNumberOfLights; index++) {
         var light = new Light();
         light.index = index;
@@ -52,11 +58,7 @@ module.exports = function(router) {
 
         light.updateCoordinates();
 
-        light.save(function(err, light) {
-          if (err) {
-            console.error(err);
-          }
-        });
+        light.save(onSaveCallback);
       }
 
       res.json({ message: 'handler created!' });
