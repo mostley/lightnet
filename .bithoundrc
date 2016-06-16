@@ -12,8 +12,8 @@
     "**/**jquery.?(ui|effects)-*.*.?(*).?(cs|j)s",
     "**/**jquery-*.*.?(*).?(cs|j)s",
     "**/modernizr.custom.?(*).js",
+    "**/bootstrap/**",
     "bower_components/**",
-    "**/bootstrap/**,
     "handlers/TestHandler/js/voxel.js"
   ],
   "test": [
