@@ -1,0 +1,23 @@
+{
+  "ignore": [
+    "**/deps/**",
+    "**/node_modules/**",
+    "**/thirdparty/**",
+    "**/third_party/**",
+    "**/3rdparty/**",
+    "**/vendor/**",
+    "**/**-min-**",
+    "**/**-min.**",
+    "**/**.min.**",
+    "**/**jquery.?(ui|effects)-*.*.?(*).?(cs|j)s",
+    "**/**jquery-*.*.?(*).?(cs|j)s",
+    "**/modernizr.custom.?(*).js",
+    "bower_components/**"
+  ],
+  "test": [
+    "**/test/**",
+    "**/tests/**",
+    "**/spec/**",
+    "**/specs/**"
+  ]
+}
