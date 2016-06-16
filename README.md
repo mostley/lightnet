@@ -1,3 +1,5 @@
+[![bitHound Overall Score](https://www.bithound.io/github/mostley/lightnet/badges/score.svg)](https://www.bithound.io/github/mostley/lightnet)
+
 # lightnet
 Lightmanagement Server to control room lighting
 

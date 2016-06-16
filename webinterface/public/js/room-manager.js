@@ -12,7 +12,7 @@ function RoomManager() {
   $('#saveRoomBtn').click(this.saveRoomClicked.bind(this));
   $('#deleteRoomBtn').click(this.deleteCurrentRoom.bind(this));
   $('#addRoomDialog').on('shown.bs.modal', function () {
-    $('#roomNameInput').focus()
+    $('#roomNameInput').focus();
   });
 
   $('#removePointBtn').click(this.removeCurrentOutlineSegment.bind(this));

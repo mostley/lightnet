@@ -18,7 +18,7 @@ function Vector3( x, y, z ) {
         this.y = y || 0;
         this.z = z || 0;
 
-};
+}
 
 Vector3.prototype = {
 
@@ -637,7 +637,7 @@ Vector3.prototype = {
 
                         return this.sub( v1 );
 
-                }
+                };
 
         }(),
 
@@ -654,7 +654,7 @@ Vector3.prototype = {
 
                         return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-                }
+                };
 
         }(),
 

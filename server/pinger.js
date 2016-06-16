@@ -39,17 +39,21 @@ function executePing() {
         return;
       }
 
-      for (var i in handlerIps) {
-        var ip = handlerIps[i];
-
-        console.log("Pinging " + ip);
-        ping.sys.probe(ip, function (isAlive) {
+      var createProbeCallback = function(ip) {
+        return function(isAlive) {
           if (!isAlive) {
             setLightActiveByHandler(ip, false);
           } else {
             setLightActiveByHandler(ip, true);
           }
-        });
+        };
+      };
+
+      for (var i in handlerIps) {
+        var ip = handlerIps[i];
+
+        console.log("Pinging " + ip);
+        ping.sys.probe(ip, createProbeCallback(ip));
       }
 
       setTimeout(executePing, config.machinePingInterval);

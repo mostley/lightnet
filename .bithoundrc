@@ -12,7 +12,9 @@
     "**/**jquery.?(ui|effects)-*.*.?(*).?(cs|j)s",
     "**/**jquery-*.*.?(*).?(cs|j)s",
     "**/modernizr.custom.?(*).js",
-    "bower_components/**"
+    "bower_components/**",
+    "**/bootstrap/**,
+    "handlers/TestHandler/js/voxel.js"
   ],
   "test": [
     "**/test/**",

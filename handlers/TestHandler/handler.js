@@ -58,7 +58,7 @@ Handler.prototype.saveToForm = function() {
   $('#handlerDirection1Field').val(this.geometryDirection1);
   $('#handlerDirection2Field').val(this.geometryDirection2);
   $('#handlerDirection3Field').val(this.geometryDirection3);
-}
+};
 
 Handler.prototype.register = function(callback) {
   var path = '/handlers';
@@ -188,7 +188,7 @@ Handler.getHandlerFromForm = function() {
   return new Handler({
     id: $('#handlerIDField').val().trim(),
     lightCount: parseInt($('#handlerLightCountField').val()),
-    lightCount: parseFloat($('#handlerLightSizeField').val()),
+    lightSize: parseFloat($('#handlerLightSizeField').val()),
     ipAddress: $('#handlerIPField').val(),
     info: $('#handlerInfoField').val(),
     type: parseInt($('#handlerTypeField').val()),

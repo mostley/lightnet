@@ -18,7 +18,7 @@ LightManager.prototype.setLight = function (id, r, g, b) {
       toastr.error("I failed to control this light, sorry");
     }
   });
-}
+};
 
 LightManager.prototype.createLightRow = function (light) {
   var me = this;
@@ -46,7 +46,7 @@ LightManager.prototype.createLightRow = function (light) {
   row.append($('<td></td>').append(buttons));
 
   return row;
-}
+};
 
 LightManager.prototype.appendLightToTable = function (light) {
   var row = this.createLightRow(light);
@@ -63,8 +63,7 @@ LightManager.prototype.appendHandlerToList = function (handler) {
   var me = this;
 
   var name = handler.id + ' - ' + handler.ipAddress;
-  var tooltip = 'version: ' + handler.version + ' type: ' + handler.type + ' offset: ('
-    + handler.offsetX + ':' + handler.offsetY + ':' + handler.offsetZ + ') info: ' + handler.info;
+  var tooltip = 'version: ' + handler.version + ' type: ' + handler.type + ' offset: (' + handler.offsetX + ':' + handler.offsetY + ':' + handler.offsetZ + ') info: ' + handler.info;
 
   var handlerLink = $('<li id="handleritem_' + handler.id + '" data-handler-id="' + handler.id + '" title="' + tooltip + '"><a href="#">' + name + '</a></li>');
   handlerLink.on('click', function() {
@@ -143,13 +142,13 @@ LightManager.prototype.onData = function (lightList) {
     $('#lightrow_' + lightsToDelete[i]._id).remove();
   }
 
-  for (var i in handlersToDelete) {
-    delete this.handlers[handlersToDelete[i].id];
-    $('#handleritem_' + handlersToDelete[i].id).remove();
+  for (var j in handlersToDelete) {
+    delete this.handlers[handlersToDelete[j].id];
+    $('#handleritem_' + handlersToDelete[j].id).remove();
   }
 
-  for (var i in lightList) {
-    var light = lightList[i];
+  for (var k in lightList) {
+    var light = lightList[k];
 
     if (!this.lights[light._id]) {
       this.lights[light._id] = light;
