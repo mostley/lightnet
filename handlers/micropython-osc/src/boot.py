@@ -13,8 +13,7 @@ print("===== Booting Lighnet Handler =====")
 print("Connecting to wifi")
 
 if not __ESP__:
-    print("[No-ESP] skipped connecting to wifi")
-    return
+    raise Exception("[No-ESP] skipped connecting to wifi")
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)

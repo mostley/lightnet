@@ -1,10 +1,10 @@
 import server
 from pixelcontroller import PixelController, ControllerMode
 
-class Server:
+class Handler:
     def __init__(self):
         self.pixelController = None
-        self.host = 'localhost'
+        self.host = '127.0.0.1'
         self.port = 2525
 
         self.pixelController = PixelController([1], ControllerMode.Line)

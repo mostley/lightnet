@@ -11,7 +11,7 @@ from ustruct import unpack
 from common import Impulse, to_time
 
 
-MAX_DGRAM_SIZE = 1472
+MAX_DGRAM_SIZE = 64
 
 
 def split_oscstr(msg, offset):
@@ -141,7 +141,7 @@ def handle_osc(data, src, dispatch=None, strict=False):
 def run_server(saddr, port, handler=handle_osc):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    if __debug__: print("[DEBUG] Created OSC UDP server socket.")
+    if __debug__: print("[DEBUG] Created OSC UDP server socket.", saddr, port)
 
     sock.bind((saddr, port))
     print("Listening for OSC messages on", saddr, port)
