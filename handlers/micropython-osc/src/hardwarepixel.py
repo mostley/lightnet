@@ -2,7 +2,8 @@ __ESP__ = True
 import sys
 
 try:
-    import machine, pixel
+    import machine
+    from neopixel import NeoPixel
 except Exception as exc:
     print("Failed to import hardware packages, switching to no ESP mode")
     sys.print_exception(exc)
@@ -15,14 +16,15 @@ class HardwarePixel:
 
         if __ESP__:
             pin = machine.Pin(self.ledPin, machine.Pin.OUT, machine.Pin.PULL_UP)
-            self.pixels = pixel.NeoPixel(pin, numberOfLeds)
+            self.pixels = NeoPixel(pin, numberOfLeds)
         else:
             print("[No-ESP] skipped initialization of pixel controller")
 
-    def write(self, lightDataList):
+    def write(self, index, color):
+        print("write ", index, color)
+
         if __ESP__:
-            for lightData in lightDataList:
-                self.pixels[lightData['index']] = lightData['color']
+            self.pixels[index] = color
         else:
             print("[No-ESP] skipped pixel update")
 

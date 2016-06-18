@@ -1,3 +1,0 @@
-open tty.SLAB_USBtoUART
-put boot.py
-ls

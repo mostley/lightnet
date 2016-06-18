@@ -1,5 +1,5 @@
 import server, sys
-from pixelcontroller import PixelController, ControllerMode
+from hardwarepixel import HardwarePixel
 __ESP__ = True
 
 try:
@@ -11,14 +11,13 @@ except Exception as exc:
 
 class Handler:
     def __init__(self):
-        self.pixelController = None
         if __ESP__:
             self.host = network.WLAN(network.STA_IF).ifconfig()[0]
         else:
             self.host = '127.0.0.1'
         self.port = 2525
 
-        self.pixelController = PixelController([1], ControllerMode.Line)
+        self.hardwarePixel = HardwarePixel(21)
 
     def start(self):
         print("Starting server")
@@ -47,10 +46,12 @@ class Handler:
         if len(addrParts) > 0 and addrParts[0] == '':
             addrParts = addrParts[1:]
 
-        if len(addrParts) > 3:
-            if addrParts[0] == 'leds':
-                pos = self.parsePos(addrParts[1:4])
+        if len(addrParts) > 1:
+            if addrParts[0] == 'led':
+                index = int(addrParts[1])
                 data = args[0]
-
-                self.pixelController.setLed(pos, data[0:3], data[3])
-                self.pixelController.updateLeds()
+                print("color", data[0:3])
+                self.hardwarePixel.write(index, data[0:3])
+                self.hardwarePixel.flush()
+            else:
+                print("unknown message address", oscaddr)
