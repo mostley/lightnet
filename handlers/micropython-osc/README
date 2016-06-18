@@ -15,3 +15,17 @@ then make sure your board is connected and
 execute ./deploy.sh to deploy the osc server to your ESP8266
 
 it might be neccessary to adjust the tty address in the src/deploy.mpf file
+
+
+## blink codes
+
+the handler blinks 2 times clearly in the beginning of the boot process. The led turns off when the handler was started successfully.
+
+
+## updating the software
+
+to get into flash mode:
+ * reset the chip (reset button, connect power or Strg-D in repl mode)
+ * press the flash button when the led starts blinking and keep pressing it until it either blinks 5 times or turns off
+ * if it turned off start over, it should blink 5 times rapidly and then stay on
+ * Now you can call ./deploy.sh to flash the update.

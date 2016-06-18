@@ -1,10 +1,21 @@
-import server
+import server, sys
 from pixelcontroller import PixelController, ControllerMode
+__ESP__ = True
+
+try:
+    import network
+except Exception as exc:
+    print("Failed to import hardware packages, switching to no ESP mode")
+    sys.print_exception(exc)
+    __ESP__ = False
 
 class Handler:
     def __init__(self):
         self.pixelController = None
-        self.host = '127.0.0.1'
+        if __ESP__:
+            self.host = network.WLAN(network.STA_IF).ifconfig()[0]
+        else:
+            self.host = '127.0.0.1'
         self.port = 2525
 
         self.pixelController = PixelController([1], ControllerMode.Line)
@@ -39,7 +50,7 @@ class Handler:
         if len(addrParts) > 3:
             if addrParts[0] == 'leds':
                 pos = self.parsePos(addrParts[1:4])
-                color = args[0]
+                data = args[0]
 
-                self.pixelController.setLed(pos, color)
+                self.pixelController.setLed(pos, data[0:3], data[3])
                 self.pixelController.updateLeds()

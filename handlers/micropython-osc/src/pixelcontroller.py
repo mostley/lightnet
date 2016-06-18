@@ -29,9 +29,7 @@ class PixelController:
         self.hardwarePixel = HardwarePixel(numberOfLeds)
 
     def setLed(self, pos, color, softness):
-        print('turn leds at', pos, 'to be color', color)
-
-        index = self.getIndexFromPosition(pos)
+        print('turn leds near', pos, 'to be color', color, 'with softness', softness)
 
         lightData = self.lightCalculator.calculate(pos, color, softness)
         self.hardwarePixel.write(lightData)

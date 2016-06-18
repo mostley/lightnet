@@ -40,7 +40,9 @@ class PixelCalculatorBase:
 
         squareDistances = self.calculateSquareDistances(pos)
 
-        for squareDistance in squareDistances:
+        for index in range(len(squareDistances)):
+            squareDistance = squareDistances[index]
+            
             diminishedColor = self.calculateColor(color, squareDistance, softness)
             if diminishedColor != None:
                 result.append({ "index": index, "color": diminishedColor })

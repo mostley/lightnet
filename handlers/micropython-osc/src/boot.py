@@ -15,8 +15,28 @@ print("Connecting to wifi")
 if not __ESP__:
     raise Exception("[No-ESP] skipped connecting to wifi")
 
+def blink(led, duration):
+    led.high()
+    time.sleep(duration)
+    led.low()
+    time.sleep(duration)
+
+def checkForFlashMode():
+    if machine.Pin(0, machine.Pin.IN).value() == 0:
+        wlan.active(False)
+        for i in range(5):
+            blink(ledPin, 0.05)
+        raise Exception("Flashmode Exception: Handler is intentionally not starting.")
+
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
+
+ledPin = machine.Pin(2, machine.Pin.OUT, machine.Pin.PULL_UP)
+checkForFlashMode()
+for i in range(2):
+    blink(ledPin, 0.5)
+checkForFlashMode()
+
 if not wlan.isconnected():
     print('connecting to network (' + config.ssid + ')')
     wlan.connect(config.ssid, config.wifipassword)

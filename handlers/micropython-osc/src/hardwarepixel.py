@@ -1,8 +1,11 @@
 __ESP__ = True
+import sys
+
 try:
     import machine, pixel
-except:
+except Exception as exc:
     print("Failed to import hardware packages, switching to no ESP mode")
+    sys.print_exception(exc)
     __ESP__ = False
 
 class HardwarePixel:
@@ -19,7 +22,7 @@ class HardwarePixel:
     def write(self, lightDataList):
         if __ESP__:
             for lightData in lightDataList:
-                self.pixels[lightData.index] = lightData.color
+                self.pixels[lightData['index']] = lightData['color']
         else:
             print("[No-ESP] skipped pixel update")
 

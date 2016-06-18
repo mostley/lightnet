@@ -4,12 +4,11 @@
 #
 """A minimal OSC UDP server."""
 
-import socket
+import socket, sys
 
 from ustruct import unpack
 
 from common import Impulse, to_time
-
 
 MAX_DGRAM_SIZE = 64
 
@@ -128,6 +127,7 @@ def handle_osc(data, src, dispatch=None, strict=False):
     try:
         for timetag, (oscaddr, tags, args) in messages:
             if __debug__:
+                print(oscaddr)
                 print("[DEBUG] OSC address: %s" % oscaddr)
                 print("[DEBUG] OSC type tags: %r" % tags)
                 print("[DEBUG] OSC arguments: %r" % (args,))
@@ -135,7 +135,8 @@ def handle_osc(data, src, dispatch=None, strict=False):
             if dispatch:
                 dispatch(timetag, (oscaddr, tags, args, src))
     except Exception as exc:
-        print("[ERR] Exception in OSC handler: %s", exc)
+        print("[ERR] Exception in OSC handler")
+        sys.print_exception(exc)
 
 
 def run_server(saddr, port, handler=handle_osc):
