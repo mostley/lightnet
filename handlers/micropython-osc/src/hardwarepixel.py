@@ -21,8 +21,6 @@ class HardwarePixel:
             print("[No-ESP] skipped initialization of pixel controller")
 
     def write(self, index, color):
-        print("write ", index, color)
-
         if __ESP__:
             self.pixels[index] = color
         else:

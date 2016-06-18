@@ -1,33 +1,51 @@
-import client, time
+import client, time, math
+from common import Bundle
 
 
 n = 1
 
+def createBundle(data):
+    bundleData = []
+    for i in range(0, 21):
+        bundleData.append(('/led', ('i', i), ('r', data[i])))
+    return Bundle(*bundleData)
+
 def sendColor(c, index, r, g, b):
-    address = '/led/' + str(index)
+    address = '/led'
     print("sendColor", c, index, r, g, b)
-    msg = client.create_message(address, ('r', (r, g, b, 255)))
+    msg = client.create_message(address, ('i', index), ('r', (r, g, b, 255)))
     c.send(msg)
+
+def sendBundle(c, bundle):
+    address = '/leds'
+    print("sendBundle")
+    c.send(bundle)
+
+def wheel(wheelPos):
+  wheelPos = 255 - wheelPos;
+  if wheelPos < 85:
+    return (255 - wheelPos * 3, 0, wheelPos * 3)
+
+  if wheelPos < 170:
+    wheelPos -= 85;
+    return (0, wheelPos * 3, 255 - wheelPos * 3)
+
+  wheelPos -= 170;
+  return (wheelPos * 3, 255 - wheelPos * 3, 0)
+
 
 c = client.Client('192.168.178.26', 2525)
 
-# for i in range(0, 4 * 256, 8):
-#     for j in range(n):
-#         if (i // 256) % 2 == 0:
-#             val = i & 0xff
-#         else:
-#             val = 255 - (i & 0xff)
-#         sendColor(c, 0, val, 0, 0)
-#         time.sleep_ms(60)
+bundles = []
+for n in range(0, 256):
+    bundleData = createBundle([wheel(i+n) for i in range(21)])
+    bundles.append(Bundle(*bundleData))
 
-for n in range(0, 4):
-    for i in range(0, 22):
-        if i > 0:
-            sendColor(c, i-1, 0, 0, 0)
-        sendColor(c, i, 255, 0, 0)
-        time.sleep_ms(60)
+for bundle in bundles:
+    sendBundle(c, bundle)
+    time.sleep_ms(60)
 
-for i in range(0, 22):
-    sendColor(c, i, 0, 0, 0)
+
+sendBundle(c, createBundle([(0,0,0) for i in range(21)]))
 
 c.close()

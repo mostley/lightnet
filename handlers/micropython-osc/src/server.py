@@ -10,7 +10,7 @@ from ustruct import unpack
 
 from common import Impulse, to_time
 
-MAX_DGRAM_SIZE = 64
+MAX_DGRAM_SIZE = 1024
 
 
 def split_oscstr(msg, offset):
