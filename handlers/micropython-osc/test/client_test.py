@@ -1,7 +1,7 @@
 import client, time, math
 from common import Bundle
 
-
+IP = "192.168.43.63"
 n = 1
 
 def createBundle(data):
@@ -34,7 +34,7 @@ def wheel(wheelPos):
   return (wheelPos * 3, 255 - wheelPos * 3, 0)
 
 
-c = client.Client('192.168.178.26', 2525)
+c = client.Client(IP, 2525)
 
 bundles = []
 for n in range(0, 256):

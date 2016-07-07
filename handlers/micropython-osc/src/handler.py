@@ -16,13 +16,14 @@ class Handler:
         else:
             self.host = '127.0.0.1'
         self.port = 2525
+        self.numberOfLeds = 21
 
-        self.hardwarePixel = HardwarePixel(21)
+        self.hardwarePixel = HardwarePixel(self.numberOfLeds)
 
     def start(self):
         print("Starting server")
 
-        server.run_server(self.host, self.port, self.onMsg)
+        server.run_server(self.host, self.port, self.numberOfLeds, self.onMsg)
 
     def onMsg(self, data, src):
         server.handle_osc(data, src, self.dispatchMessage)
