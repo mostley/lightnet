@@ -12,6 +12,7 @@ var animationRoutes = require('./routes/animationroutes');
 var discoverer = require('./discoverer');
 var pinger = require('./pinger');
 var lightcleaner = require('./lightcleaner');
+var registrationServer = require('./registrationserver');
 
 // SETUP
 // =============================================================================
@@ -66,6 +67,10 @@ app.use('/api', router);
 app.listen(port);
 console.log('Magic happens on port ' + port);
 
+// START the registration server
+// =============================================================================
+registrationServer(mongoose);
+
 // START UDP Broadcast
 // =============================================================================
 discoverer();
@@ -77,4 +82,3 @@ pinger();
 // START Cleanup Task for old inactive lights
 // =============================================================================
 lightcleaner();
-

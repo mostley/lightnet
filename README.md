@@ -20,3 +20,15 @@ Lightmanagement Server to control room lighting
 # TODO
 * check whether light count has changed (in comparison with what is saved in the API) after restart
 * ping handlers if still available
+
+# Topology
+
+* nodes (e.g. esp8266) with installed Handler
+* Hub (e.g. raspberry pi zero) with installed Server
+* Devices (e.g. android) with installed Client
+
+# Handshake
+
+* Nodes listen for multicast message on 224.0.0.1:3535
+* Server multicasts a message containing "lightnet:<server-ip>"
+* Nodes answer with a TCP message to <server-ip>:3636 with "<handler-ip>;<handler-id>;<numberOfLeds>\r\n"
