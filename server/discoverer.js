@@ -7,22 +7,14 @@ var lightNetVersion = require('./package.json').version;
 var udpClient = dgram.createSocket('udp4');
 
 function sendMulticast() {
-  /*var msgData = {
-    hostname: os.hostname(),
-    name: 'LightNet',
-    version: lightNetVersion,
-    ip: process.env.IPADRESS || config.appIP,
-    port: process.env.PORT || config.appPort
-  };*/
-
-  var message = new Buffer("lightnet:" + process.env.IPADRESS || config.appIP);
+  var message = new Buffer("lightnet:" + (process.env.IPADRESS || config.appIP));
   udpClient.send(message, 0, message.length, config.discoveryPort, config.discoveryMulticastAddress, function(err) {
     if (err) {
       console.error(err);
       return;
     }
 
-    //console.log('broadcasted discover message', msgData);
+    //console.log('broadcasted discover message');
   });
 }
 

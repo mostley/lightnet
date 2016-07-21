@@ -3,7 +3,7 @@
 #  server.py
 #
 __ESP__ = True
-import socket, sys, time
+import socket, sys, time, ubinascii
 
 try:
     import machine
@@ -39,6 +39,8 @@ def parse_timetag(msg, offset):
 
 
 def parse_message(msg, strict=False):
+    print("parse_message", msg)
+    
     args = []
     addr, ofs = split_oscstr(msg, 0)
 
@@ -164,7 +166,7 @@ def waitForLightnetServer():
 
     return serverIp
 
-def registerClient(serverIp, clientIp, numberOfLeds):
+def registerClient(serverIp, handlerIp, numberOfLeds):
     print("Sending Client Registration to Lightnet Server at " + serverIp)
 
     if not __ESP__:
@@ -175,12 +177,14 @@ def registerClient(serverIp, clientIp, numberOfLeds):
         sock = socket.socket(socket.AF_INET)
         try:
             sock.connect((serverIp, 3636))
-            sock.write('%s;%s;%s\r\n' % (clientIp, machine.unique_id().decode('utf-8'), str(numberOfLeds)))
+            handlerID = ubinascii.hexlify(machine.unique_id()).decode('utf-8')
+            sock.write('%s;%s;%s\r\n' % (handlerIp, handlerID, str(numberOfLeds)))
+            #TODO: handle failure
             sock.close()
             break
         except Exception as e:
             print(e)
-            sock.close()
+        sock.close()
 
 
 def listenForOSC(saddr, port, handler):

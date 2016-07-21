@@ -32,3 +32,5 @@ Lightmanagement Server to control room lighting
 * Nodes listen for multicast message on 224.0.0.1:3535
 * Server multicasts a message containing "lightnet:<server-ip>"
 * Nodes answer with a TCP message to <server-ip>:3636 with "<handler-ip>;<handler-id>;<numberOfLeds>\r\n"
+* Server pushes the changes of the node list to the clients (TODO)
+* On User interaction Client sends a POST message to the Server
