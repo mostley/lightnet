@@ -1,3 +1,4 @@
+var dgram        = require('dgram');
 
 export default class Handler {
 
@@ -24,6 +25,22 @@ export default class Handler {
     this.numberOfLeds = this.geometry.width * this.geometry.height * this.geometry.length;
   }
 
+  function createBlobMessage(data) {
+    var result = new Buffer(data.length*3);
+
+    var n = 0;
+    for (var i=0; i<data.length; i++) {
+      var c = data[i];
+      //GRB
+      result[n+0] = c[1];
+      result[n+1] = c[0];
+      result[n+2] = c[2];
+      n += 3;
+    }
+
+    return result
+  }
+
   setColorViaHTTP(color) {
     console.log('setting light color for ' + this.toString() + ' to ' + color + ' via http');
 
@@ -43,6 +60,18 @@ export default class Handler {
       .on('response', function(response) {
           console.log("Result of Light change: " + response.statusCode);
       });
+  }
+
+  setColorViaUDP(data) {
+    const message = createBlobMessage(data);
+    const client = dgram.createSocket('udp4');
+    client.send(message, 0, message.length, PORT, HOST, err => {
+      if (err) {
+        console.error(err);
+      }
+      console.log('UDP message sent to ' + HOST +':'+ PORT);
+      client.close();
+    });
   }
 
   setColorViaOSC(color) {
@@ -75,6 +104,8 @@ export default class Handler {
       if (this.type === 0) {
         this.setColorViaHTTP(color);
       } else if (this.type === 1) {
+        this.setColorViaOSC(color);
+      } else if (this.type === 2) {
         this.setColorViaOSC(color);
       } else {
         console.error('unknown handler type ', this.type);

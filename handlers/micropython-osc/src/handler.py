@@ -16,7 +16,7 @@ class Handler:
         else:
             self.host = '127.0.0.1'
         self.port = 2525
-        self.numberOfLeds = 21
+        self.numberOfLeds = 256
 
         self.hardwarePixel = HardwarePixel(self.numberOfLeds)
 
@@ -25,29 +25,18 @@ class Handler:
 
         server.run_server(self.host, self.port, self.numberOfLeds, self.onMsg)
 
-    def onMsg(self, data, src):
-        server.handle_osc(data, src, self.dispatchMessage)
-        self.hardwarePixel.flush()
-
-    def parsePos(self, data):
-        result = []
-        for text in data:
-            result.append(int(text))
-
-        return result
+    def onMsg(self, data):
+        #print("onMsg", data)
+        #server.handle_osc(data, self.dispatchMessage)
+        self.hardwarePixel.writeDump(data)
+        #self.hardwarePixel.flush()
 
     def dispatchMessage(self, timetag, data):
         #print("dispatchMessage", timetag, data)
-        oscaddr, tags, args, src = data
-        addrParts = oscaddr.split('/')
+        oscaddr, tags, args = data
 
-        if len(addrParts) > 0 and addrParts[0] == '':
-            addrParts = addrParts[1:]
-
-        if addrParts[0] == 'led':
-            index = args[0]
-            color = args[1][0:3]
+        if oscaddr == '/l':
             #print("index", index, "color", color)
-            self.hardwarePixel.write(index, color)
+            self.hardwarePixel.write(args[0][3], args[0][0:3])
         else:
             print("unknown message address", oscaddr)

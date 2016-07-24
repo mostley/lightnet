@@ -35,7 +35,7 @@ function registerHandler(handler, uniqueID, numberOfLeds, callback) {
     let lightBase = {
       size: 1,
       active: true,
-      handlerType: 1,
+      handlerType: 2,
       handlerVersion: 'x.x.x',
       handlerOffsetX: 0,
       handlerOffsetY: 0,

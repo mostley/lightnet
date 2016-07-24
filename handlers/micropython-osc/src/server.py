@@ -39,8 +39,8 @@ def parse_timetag(msg, offset):
 
 
 def parse_message(msg, strict=False):
-    print("parse_message", msg)
-    
+    #print("parse_message", msg)
+
     args = []
     addr, ofs = split_oscstr(msg, 0)
 
@@ -115,7 +115,7 @@ def parse_bundle(bundle, strict=False):
             yield timetag, parse_message(element, strict)
 
 
-def handle_osc(data, src, dispatch=None, strict=False):
+def handle_osc(data, dispatch=None, strict=False):
     try:
         head, _ = split_oscstr(data, 0)
 
@@ -138,7 +138,7 @@ def handle_osc(data, src, dispatch=None, strict=False):
                 #print("[DEBUG] OSC arguments: %r" % (args,))
 
             if dispatch:
-                dispatch(timetag, (oscaddr, tags, args, src))
+                dispatch(timetag, (oscaddr, tags, args))
     except Exception as exc:
         print("[ERR] Exception in OSC handler")
         sys.print_exception(exc)
@@ -198,7 +198,7 @@ def listenForOSC(saddr, port, handler):
     try:
         while True:
             try:
-                data, caddr = sock.recvfrom(MAX_DGRAM_SIZE)
+                data = sock.recv(MAX_DGRAM_SIZE)
             except OSError as e:
                 data = None
                 pass
@@ -206,7 +206,7 @@ def listenForOSC(saddr, port, handler):
 
             if data:
                 if __debug__: print("[DEBUG] RECV %i bytes", len(data))
-                handler(data, caddr)
+                handler(data)
     finally:
         sock.close()
 

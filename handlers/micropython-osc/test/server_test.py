@@ -1,6 +1,6 @@
 import socket
 
-IP = "192.168.43.190"
+IP = "192.168.178.24"
 
 def send_multicast():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

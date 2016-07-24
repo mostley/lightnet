@@ -215,6 +215,8 @@ LightSchema.methods.setColor = function (color) {
       this.setColorViaHTTP(color);
     } else if (this.handlerType === 1) {
       this.setColorViaOSC(color);
+    } else if (this.handlerType === 2) {
+      console.error('single LED change not supported yet');
     } else {
       console.error('unknown handler type ', this.handlerType);
     }
