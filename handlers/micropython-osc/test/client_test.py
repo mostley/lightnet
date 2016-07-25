@@ -119,10 +119,10 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 n = 0
 while True:
-    #msg = createBlobMessage(wheelData(n))
+    msg = createBlobMessage(wheelData(n))
     #msg = createBlobMessage(runningEye(n))
     #msg = createBlobMessage(smoothRunningEye(n))
-    msg = createBlobMessage([(255,255,255) for i in range(numberOfLeds)])
+    #msg = createBlobMessage([(255,255,255) for i in range(numberOfLeds)])
     #msg = createBlobMessage([(255,255,0) for i in range(numberOfLeds)])
     #msg = createBlobMessage(whopwhop(n))
     #msg = createBlobMessage(bottlegame(n))
@@ -131,6 +131,5 @@ while True:
     time.sleep_ms(100)
 
     n += 1
-    break
 
 sock.close()

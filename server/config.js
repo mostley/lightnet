@@ -10,5 +10,6 @@ module.exports = {
   oscSrcPort: 25251,
   machinePingInterval: 3000,
   cleanupOldInterval: 10000,
-  discoveryMulticastAddress: '224.0.0.1'
+  discoveryMulticastAddress: '224.0.0.1',
+  executorSpawnerIntervall: 3000
 };
