@@ -1,11 +1,20 @@
 var instruction = require('../models/instruction');
 var config = require('../config');
 
-var executor = require('./executor');
+var execute = require('./execute');
 
 var executors = {};
 
+/*
+ * TODO:
+ * - regularily check if instructions changed and change executors
+ * - spawn oneTime executors on server start
+ * - respawn oneTime executors on handler rediscover
+*/
+
 function spawnExecutor(handlerID, listOfInstructions) {
+  console.log('[Executor] spawning executor');
+  return execute(handlerID, listOfInstructions);
 }
 
 function spawnExecutors() {
@@ -15,20 +24,16 @@ function spawnExecutors() {
       return;
     }
 
-    let instructionsPerHandler = {};
+    let handlerIds = [];
     instructions.forEach(instruction => {
-      var executorBatchID = getExecutorBatchID(instruction);
-
-      if (!instructionsPerHandler[instruction.handlerID]) {
-        instructionsPerHandler[instruction.handlerID] = [];
+      if (handlerIds.indexOf(instruction.handlerID) < 0) {
+        handlerIds.push(instruction.handlerID);
       }
-
-      instructionsPerHandler[instruction.handlerID].push(instruction);
     });
 
-    for (var handlerID in instructionsPerHandler) {
-      executors[handlerID] = spawnExecutor(instruction.handlerID, instructionsPerHandler[instruction.handlerID]);
-    }
+    handlerIds.forEach(handlerId => {
+      executors[handlerID] = spawnExecutor(handlerID);
+    });
   });
 }
 

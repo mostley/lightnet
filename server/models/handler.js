@@ -41,7 +41,7 @@ export default class Handler {
     return result
   }
 
-  setColorViaHTTP(color) {
+  setPatternViaHTTP(color) {
     console.log('setting light color for ' + this.toString() + ' to ' + color + ' via http');
 
     //TODO bundle
@@ -62,7 +62,7 @@ export default class Handler {
       });
   }
 
-  setColorViaUDP(data) {
+  setPatternViaUDP(data) {
     const message = createBlobMessage(data);
     const client = dgram.createSocket('udp4');
     client.send(message, 0, message.length, PORT, HOST, err => {
@@ -74,7 +74,7 @@ export default class Handler {
     });
   }
 
-  setColorViaOSC(color) {
+  setPatternViaOSC(color) {
     console.log('setting light color for ' + this.toString() + ' to ' + color + ' via OSC');
 
     //TODO bundle
@@ -99,14 +99,14 @@ export default class Handler {
     }, this.handler, config.oscSrcPort);
     oscSocket.close();
   }
-
-  setColor(color) {
+//todo rename from set color to pattern
+  setPattern(pattern) {
       if (this.type === 0) {
-        this.setColorViaHTTP(color);
+        this.setPatternViaHTTP(pattern);
       } else if (this.type === 1) {
-        this.setColorViaOSC(color);
+        this.setPatternViaOSC(pattern);
       } else if (this.type === 2) {
-        this.setColorViaOSC(color);
+        this.setPatternViaOSC(pattern);
       } else {
         console.error('unknown handler type ', this.type);
       }
