@@ -5,6 +5,8 @@ var execute = require('./execute');
 
 var executors = {};
 
+var instructionCache = {};
+
 /*
  * TODO:
  * - regularily check if instructions changed and change executors
@@ -24,19 +26,25 @@ function spawnExecutors() {
       return;
     }
 
-    let handlerIds = [];
-    instructions.forEach(instruction => {
-      if (handlerIds.indexOf(instruction.handlerID) < 0) {
-        handlerIds.push(instruction.handlerID);
+    let newHandlerIds = [];
+    instructions.forEach(inst => {
+      if (!instructionCache[inst.handlerID]) {
+        instructionCache[inst.handlerID]  = {}
+      }
+
+      if (!inst.equals(instructionCache[inst.handlerID][inst.id])) {
+        console.log('[ExecutorSpawner] found new or changed instruction with id', inst.id);
+        instructionCache[inst.handlerID][inst.id] = inst;
+        newHandlerIds.push(inst.handlerID);
       }
     });
 
-    handlerIds.forEach(handlerId => {
+    newHandlerIds.forEach(handlerId => {
       executors[handlerID] = spawnExecutor(handlerID);
     });
   });
+
+  setTimeout(spawnExecutors, config.executorSpawnerIntervall);
 }
 
-module.exports = function () {
-    setTimeout(spawnExecutors, config.executorSpawnerIntervall);
-};
+spawnExecutors();

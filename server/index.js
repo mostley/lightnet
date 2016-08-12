@@ -82,3 +82,9 @@ pinger();
 // START Cleanup Task for old inactive lights
 // =============================================================================
 lightcleaner();
+
+executioner = child_process.fork('execution/executionspawner');
+
+process.on('exit', function() {
+  executioner.kill();
+});

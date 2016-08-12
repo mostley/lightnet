@@ -2,7 +2,11 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var InstructionSchema   = new Schema({
-  // the name of the room
+
+  // the id of the instruction
+  id: String,
+
+  // the name of the instruction
   name: String,
 
   // the ID of the handler to be targeted
@@ -23,6 +27,32 @@ var InstructionSchema   = new Schema({
   // the application mode of the instruction, 0 = set (default) 1 = add 2 = multiply 3 = substract
   mode: Number
 });
+
+InstructionSchema.methods.equals = function(otherInstruction) {
+  let result = true;
+
+  if (!otherInstruction) {
+    result = false;
+  } else if (this.id !== otherInstruction.id) {
+    result = false;
+  } else if (this.name !== otherInstruction.name) {
+    result = false;
+  } else if (this.handlerID !== otherInstruction.handlerID) {
+    result = false;
+  } else if (this.indexRangeStart !== otherInstruction.indexRangeStart) {
+    result = false;
+  } else if (this.indexRangeEnd !== otherInstruction.indexRangeEnd) {
+    result = false;
+  } else if (this.patterns !== otherInstruction.patterns) {
+    result = false;
+  } else if (this.looping !== otherInstruction.looping) {
+    result = false;
+  } else if (this.mode !== otherInstruction.mode) {
+    result = false;
+  }
+
+  return result;
+};
 
 InstructionSchema.methods.addFillPattern = function(color) {
   var pattern = [];
