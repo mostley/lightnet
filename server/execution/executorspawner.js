@@ -19,6 +19,10 @@ function spawnExecutor(handlerID, listOfInstructions) {
   return execute(handlerID, listOfInstructions);
 }
 
+function stopExecutor(handlerID) {
+  clearInterval(executors[handlerID]);
+}
+
 function spawnExecutors() {
   instruction.find((err, instructions) => {
     if (err) {
@@ -40,7 +44,17 @@ function spawnExecutors() {
     });
 
     newHandlerIds.forEach(handlerId => {
-      executors[handlerID] = spawnExecutor(handlerID);
+      if (executors[handlerID]) {
+        stopExecutor(handlerID)
+      }
+
+      spawnExecutor(handlerID)
+        .then(timer => {
+          executors[handlerID] = timer;
+        })
+        .catch(err => {
+          console.error(err);
+        });
     });
   });
 

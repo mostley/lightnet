@@ -143,24 +143,35 @@ function prepareExecution(handlerID) {
     });
 }
 
-function execute(handlerID, looping, patterns, currentCursor) {
+function run(handlerID, pattern) {
+  return getHandler(handlerID).then(handler => {
+    handler.setPattern(pattern);
+  });
+}
+
+function execute(handlerID, looping, patterns) {
   return new Promise((resolve, reject) => {
 
-    let pattern = patterns[currentCursor];
-    currentCursor++;
-    handler.setPattern(pattern);
+    let currentCursor = 0;
 
-    let timer = setTimeout(() => {
-      execute(handlerID, looping, patterns, currentCursor);
-    }, fixedInterval);
+    run(handlerID, patterns[currentCursor]);
 
-    resolve(timer);
+    if (looping) {
+      let timer = setInterval(() => {
+        currentCursor++;
+        run(handlerID, patterns[currentCursor]);
+      }, fixedInterval);
+
+      resolve(timer);
+    } else {
+      resolve(null);
+    }
   });
 }
 
 module.exports = function(handlerID) {
   return prepareExecution(handlerID)
     .then({ handler, looping, patterns } => {
-      return execute(handler, looping, patterns, 0);
+      return execute(handler, looping, patterns);
     });
 };
