@@ -41,27 +41,6 @@ export default class Handler {
     return result
   }
 
-  setPatternViaHTTP(color) {
-    console.log('setting light color for ' + this.toString() + ' to ' + color + ' via http');
-
-    //TODO bundle
-
-    request
-      .post("http://" + this.handler + "/")
-      .form({
-          index: this.index,
-          r: color[0],
-          g: color[1],
-          b: color[2]
-      })
-      .on('error', function(err) {
-          console.error(err);
-      })
-      .on('response', function(response) {
-          console.log("Result of Light change: " + response.statusCode);
-      });
-  }
-
   setPatternViaUDP(data) {
     const message = createBlobMessage(data);
     const client = dgram.createSocket('udp4');
@@ -74,39 +53,13 @@ export default class Handler {
     });
   }
 
-  setPatternViaOSC(color) {
-    console.log('setting light color for ' + this.toString() + ' to ' + color + ' via OSC');
-
-    //TODO bundle
-
-    var oscSocket = new osc.UDPPort({
-        localAddress: "0.0.0.0",
-        localPort: config.oscPort
-    });
-    oscSocket.on("error", function (error) {
-        console.log("An error occurred: ", error.message);
-    });
-    oscSocket.open();
-    oscSocket.send({
-      address: "/led",
-      args: [{
-        type: "i",
-        value: this.index
-      },{
-        type: "r",
-        value: [color[0], color[1], color[2], 255]
-      }]
-    }, this.handler, config.oscSrcPort);
-    oscSocket.close();
-  }
-//todo rename from set color to pattern
   setPattern(pattern) {
       if (this.type === 0) {
-        this.setPatternViaHTTP(pattern);
+        console.error('bulk LED change via HTTP not supported yet');
       } else if (this.type === 1) {
-        this.setPatternViaOSC(pattern);
+        console.error('bulk LED change via OSC not supported yet');
       } else if (this.type === 2) {
-        this.setPatternViaOSC(pattern);
+        this.setPatternViaUDP(pattern);
       } else {
         console.error('unknown handler type ', this.type);
       }

@@ -143,23 +143,23 @@ function prepareExecution(handlerID) {
     });
 }
 
-function run(handlerID, pattern) {
+function execute(handlerID, pattern) {
   return getHandler(handlerID).then(handler => {
     handler.setPattern(pattern);
   });
 }
 
-function execute(handlerID, looping, patterns) {
+function startTimer(handlerID, looping, patterns) {
   return new Promise((resolve, reject) => {
 
     let currentCursor = 0;
 
-    run(handlerID, patterns[currentCursor]);
+    execute(handlerID, patterns[currentCursor]);
 
     if (looping) {
       let timer = setInterval(() => {
         currentCursor++;
-        run(handlerID, patterns[currentCursor]);
+        execute(handlerID, patterns[currentCursor]);
       }, fixedInterval);
 
       resolve(timer);
@@ -172,6 +172,6 @@ function execute(handlerID, looping, patterns) {
 module.exports = function(handlerID) {
   return prepareExecution(handlerID)
     .then({ handler, looping, patterns } => {
-      return execute(handler, looping, patterns);
+      return startTimer(handler, looping, patterns);
     });
 };
