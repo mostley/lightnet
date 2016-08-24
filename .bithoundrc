@@ -1,0 +1,25 @@
+{
+  "ignore": [
+    "**/deps/**",
+    "**/node_modules/**",
+    "**/thirdparty/**",
+    "**/third_party/**",
+    "**/3rdparty/**",
+    "**/vendor/**",
+    "**/**-min-**",
+    "**/**-min.**",
+    "**/**.min.**",
+    "**/**jquery.?(ui|effects)-*.*.?(*).?(cs|j)s",
+    "**/**jquery-*.*.?(*).?(cs|j)s",
+    "**/modernizr.custom.?(*).js",
+    "**/bootstrap/**",
+    "bower_components/**",
+    "handlers/TestHandler/js/voxel.js"
+  ],
+  "test": [
+    "**/test/**",
+    "**/tests/**",
+    "**/spec/**",
+    "**/specs/**"
+  ]
+}

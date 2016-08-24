@@ -7,9 +7,12 @@ var config = require('./config');
 var lightRoutes = require('./routes/lightroutes');
 var controlRoutes = require('./routes/controlroutes');
 var handlerRoutes = require('./routes/handlerroutes');
+var roomRoutes = require('./routes/roomroutes');
+var animationRoutes = require('./routes/animationroutes');
 var discoverer = require('./discoverer');
 var pinger = require('./pinger');
 var lightcleaner = require('./lightcleaner');
+var registrationServer = require('./registrationserver');
 
 // SETUP
 // =============================================================================
@@ -28,6 +31,8 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 docs(app, mongoose);
+
+var expressWs = require('express-ws')(app);
 
 var port = process.env.PORT || config.appPort;
 
@@ -48,17 +53,23 @@ router.get('/', function(req, res) {
   res.json({ message: 'Welcome to the LightNet. A LabNet Service provided to you by FabLab Karlsruhe e.V.' });
 });
 
-lightRoutes(router);
-controlRoutes(router);
-handlerRoutes(router);
+lightRoutes(router, app, expressWs);
+controlRoutes(router, app, expressWs);
+handlerRoutes(router, app, expressWs);
+roomRoutes(router, app, expressWs);
+animationRoutes(router, app, expressWs);
 
-// REGISTER ROUTES -------------------------------
+// REGISTER ROUTES -------------------------------------------------------------
 app.use('/api', router);
 
 // START SERVER
 // =============================================================================
 app.listen(port);
 console.log('Magic happens on port ' + port);
+
+// START the registration server
+// =============================================================================
+registrationServer(mongoose);
 
 // START UDP Broadcast
 // =============================================================================
@@ -72,3 +83,8 @@ pinger();
 // =============================================================================
 lightcleaner();
 
+executioner = child_process.fork('execution/executionspawner');
+
+process.on('exit', function() {
+  executioner.kill();
+});

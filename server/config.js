@@ -1,12 +1,15 @@
 module.exports = {
-  appIP: '192.168.1.6',
+  appIP: '192.168.178.24',
   appPort: 4050,
-  //dbUrl: 'mongodb://teachable:teachable@ds043982.mongolab.com:43982/teachable',
-  dbUrl: 'mongodb://mongo/machinenet',
+  dbUrl: 'mongodb://teachable:teachable@ds015892.mlab.com:15892/teachable',
+  //dbUrl: 'mongodb://mongo/machinenet',
   discoverySrcPort: 25251,
-  discoveryPort: 2525,
+  discoveryPort: 3535,
   discoveryInterval: 3000,
+  oscPort: 2525,
+  oscSrcPort: 25251,
   machinePingInterval: 3000,
   cleanupOldInterval: 10000,
-  discoveryMulticastAddress: '224.0.0.1'
+  discoveryMulticastAddress: '224.0.0.1',
+  executorSpawnerIntervall: 3000
 };

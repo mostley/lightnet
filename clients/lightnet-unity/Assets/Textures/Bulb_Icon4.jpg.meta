@@ -1,0 +1,121 @@
+fileFormatVersion: 2
+guid: 034e436e79c974848a5c728b4fa89059
+timeCreated: 1469374445
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Bulb_Icon4_0
+    21300002: Bulb_Icon4_1
+    21300004: Bulb_Icon4_2
+    21300006: Bulb_Icon4_3
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 179, y: 184, z: 1767, w: 1766}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Bulb_Icon4_0
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 1773
+        width: 1590
+        height: 1590
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -459.95258, y: 460.86707}
+        - {x: -459.95258, y: -459.13293}
+        - {x: 460.04742, y: -459.13293}
+        - {x: 460.04742, y: 460.86707}
+    - name: Bulb_Icon4_1
+      rect:
+        serializedVersion: 2
+        x: 1770
+        y: 1773
+        width: 1590
+        height: 1590
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -459.86707, y: 460.86707}
+        - {x: -459.86707, y: -459.13293}
+        - {x: 460.13293, y: -459.13293}
+        - {x: 460.13293, y: 460.86707}
+    - name: Bulb_Icon4_2
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 183
+        width: 1590
+        height: 1590
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -459.95258, y: 460.78156}
+        - {x: -459.95258, y: -459.21844}
+        - {x: 460.04742, y: -459.21844}
+        - {x: 460.04742, y: 460.78156}
+    - name: Bulb_Icon4_3
+      rect:
+        serializedVersion: 2
+        x: 1770
+        y: 183
+        width: 1590
+        height: 1590
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -459.86707, y: 460.78156}
+        - {x: -459.86707, y: -459.21844}
+        - {x: 460.13293, y: -459.21844}
+        - {x: 460.13293, y: 460.78156}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

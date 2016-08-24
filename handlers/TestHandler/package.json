@@ -1,0 +1,27 @@
+{
+  "name": "testhandler",
+  "version": "1.0.0",
+  "description": "a test tool for lightnet",
+  "main": "index.html",
+  "window": {
+    "toolbar": false,
+    "width": 1024,
+    "height": 768
+  },
+  "dependencies": {
+    "nw": "^0.12.3"
+  },
+  "devDependencies": {
+    "nw-dev": "^1.3.1"
+  },
+  "scripts": {
+    "start": "nw --remote-debugging-port=9222 .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mostley/lightnet/tree/master/handlers/TestHandler"
+  },
+  "author": "Sven Hecht <sven.hecht@gmail.com>",
+  "license": "MIT"
+}

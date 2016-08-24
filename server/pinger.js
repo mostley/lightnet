@@ -10,6 +10,12 @@ function setLightActiveByHandler(handler, active) {
       return;
     }
 
+    var onSaveCallback = function(err, light) {
+      if (err) {
+        console.error(err);
+      }
+    };
+
     for (var i in lights) {
       var light = lights[i];
       if (light.active !== active) {
@@ -19,11 +25,7 @@ function setLightActiveByHandler(handler, active) {
           light.deactivated = new Date();
         }
 
-        light.save(function(err, light) {
-          if (err) {
-            console.error(err);
-          }
-        });
+        light.save(onSaveCallback);
       }
     }
   });
@@ -37,17 +39,21 @@ function executePing() {
         return;
       }
 
-      for (var i in handlerIps) {
-        var ip = handlerIps[i];
-
-        console.log("Pinging " + ip);
-        ping.sys.probe(ip, function (isAlive) {
+      var createProbeCallback = function(ip) {
+        return function(isAlive) {
           if (!isAlive) {
             setLightActiveByHandler(ip, false);
           } else {
             setLightActiveByHandler(ip, true);
           }
-        });
+        };
+      };
+
+      for (var i in handlerIps) {
+        var ip = handlerIps[i];
+
+        console.log("Pinging " + ip);
+        ping.sys.probe(ip, createProbeCallback(ip));
       }
 
       setTimeout(executePing, config.machinePingInterval);

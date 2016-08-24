@@ -2,8 +2,108 @@ var Light = require('../models/light');
 var Vector3 = require('../models/math/vector3');
 
 var buffer = {};
+var lightsources = {};
+var lightsourceIdCounter = 0;
+var webSocketCallbacks = {};
 
-module.exports = function(router) {
+module.exports = function(router, app, expressWs) {
+
+  router.route('/lightsources')
+
+    // get control (GET http://localhost:4020/api/lightsources)
+    .get(function(req, res) {
+      console.log('get lightsources');
+
+      res.json(lightsources);
+    })
+
+
+    // create a lightsource (POST http://localhost:4020/api/lightsources)
+    .post(function(req, res) {
+      console.log('create lightsource');
+
+      var lightsource = Object.assign(req.body, {
+        id: lightsourceIdCounter++,
+        p: [0, 0, 0],
+        r: 1,
+        s: 1,
+        c: [0, 0, 0]
+      });
+
+      lightsources[lightsource.id] = lightsource;
+    });
+
+
+  router.route('/lightsources/:lightsource_id')
+
+    // get the lightsource with that id (GET http://localhost:4050/api/lightsources/:lightsource_id)
+    .get(function(req, res) {
+      console.log('get lightsource ' + req.params.lightsource_id);
+
+      var result = lightsources[req.params.lightsource_id];
+      if (!result) {
+        res.status(404).send("Not Found!");
+      } else {
+        res.json(result);
+      }
+    })
+
+    // update the lightsource with this id (PUT http://localhost:4050/api/lightsources/:lightsource_id)
+    .put(function(req, res) {
+      console.log('update lightsource ' + req.params.lightsource_id);
+
+      var result = lightsources[req.params.lightsource_id];
+
+      if (!result) {
+        res.status(404).send("Not Found!");
+      } else {
+        lightsources[req.params.lightsource_id] = Object.assign(result, req.body);
+        res.json({ message: 'successfully updated' });
+      }
+    })
+
+    // delete the lightsource with this id (DELETE http://localhost:4050/api/lightsources/:lightsource_id)
+    .delete(function(req, res) {
+      console.log('delete lightsource ' + req.params.lightsource_id);
+
+      var result = lightsources[req.params.lightsource_id];
+
+      if (!result) {
+        res.status(404).send("Not Found!");
+      } else {
+        delete lightsources[req.params.lightsource_id];
+        res.json({ message: 'Successfully deleted' });
+      }
+    });
+
+
+  app.ws('/control', function(ws, req) {
+    ws.on('message', function(msg) {
+      // TODO update buffer
+      console.log('websocket message received', msg);
+    });
+  });
+  var controlClients = expressWs.getWss('/control');
+
+  function broadcastBufferChange(changeMessage) {
+    controlClients.clients.forEach(function (client) {
+      client.send(changeMessage);
+    });
+  }
+
+  app.ws('/lights', function(ws, req) {
+    ws.on('message', function(msg) {
+      // TODO update lights
+      console.log('websocket message received', msg);
+    });
+  });
+  var lightClients = expressWs.getWss('/lights');
+
+  function broadcastLightChange(changeMessage) {
+    lightClients.clients.forEach(function (client) {
+      client.send(changeMessage);
+    });
+  }
 
   router.route('/control')
 
@@ -32,6 +132,8 @@ module.exports = function(router) {
         buffer[pixel.x][pixel.y][pixel.z] = pixel.color;
       }
 
+      broadcastBufferChange(req.body);
+
       Light.find(function(err, lights) {
         if (err) {
           console.error(err);
@@ -43,9 +145,11 @@ module.exports = function(router) {
           var light = lights[i];
 
           if (data[light.x] && data[light.x][light.y] && data[light.x][light.y][light.z]) {
-            light.setColor(data[light.x][light.y][light.z]);
+            var color = data[light.x][light.y][light.z];
+            light.setColor(color);
+            broadcastLightChange({ lightId: light.id, color: color });
           }
-        };
+        }
       });
 
     });
@@ -85,6 +189,7 @@ module.exports = function(router) {
       if (!buffer[pos.x]) { buffer[pos.x] = {}; }
       if (!buffer[pos.x][pos.y]) { buffer[pos.x][pos.y] = {}; }
       buffer[pos.x][pos.y][pos.z] = color;
+      broadcastBufferChange({ x: pos.x, y: pos.y, z: pos.z, color: color });
 
       Light.find(function(err, lights) {
         console.log(lights.length + " lights in total");
@@ -100,10 +205,11 @@ module.exports = function(router) {
         for (var i=0; i<lights.length; i++) {
           if (lights[i].isAt(pos, precise)) {
             lights[i].setColor(color);
+            broadcastLightChange({ lightId: lights[i].id, color: color });
             lightCount++;
           }
           break;
-        };
+        }
 
         res.json({ message: lightCount + ' Lights updated!' });
       });

@@ -27,3 +27,6 @@ build/Release
 node_modules
 
 *.sublime-project
+.idea/
+
+handlers/micropython-osc/src/config.py

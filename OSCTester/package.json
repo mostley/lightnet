@@ -1,0 +1,14 @@
+{
+  "name": "osctester",
+  "version": "1.0.0",
+  "description": "",
+  "main": "osctester.js",
+  "scripts": {
+    "start": "node osctester.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "osc": "^2.0.3"
+  }
+}

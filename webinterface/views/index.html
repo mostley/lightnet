@@ -1,0 +1,71 @@
+
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">LightNet</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul id="navbar" class="nav navbar-nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#lights" aria-controls="lights" role="tab"
+                                                          data-toggle="tab">Lights</a></li>
+                <li role="presentation"><a href="#rooms" aria-controls="rooms" role="tab" data-toggle="tab">Rooms</a>
+                </li>
+                <li role="presentation"><a href="#lightsources" aria-controls="lightsources" role="tab"
+                                           data-toggle="tab">Lightsources</a></li>
+                <li role="presentation"><a href="#animations" aria-controls="animations" role="tab" data-toggle="tab">Animations</a>
+                </li>
+            </ul>
+
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a id="apiDocsLink" href="http://localhost:4050/apiDocs/">Api Documentation</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+
+    <div class="tab-content">
+
+        <div role="tabpanel" class="tab-pane active" id="lights">
+
+            {{> @lights }}
+
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="rooms">
+
+            {{> @rooms }}
+
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="lightsources">
+
+            {{> @lightsources }}
+
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="animations">
+
+            {{> @animations }}
+
+        </div>
+
+    </div>
+</div>
+
+{{> @addRoomDialog }}
+
+{{> @addAnimationDialog }}

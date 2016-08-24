@@ -1,0 +1,23 @@
+{
+  "name": "lightnet",
+  "version": "1.0.0",
+  "description": "Lightmanagement Server to control room lighting",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mostley/lightnet.git"
+  },
+  "author": "Sven Hecht <sven.hecht@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mostley/lightnet/issues"
+  },
+  "homepage": "https://github.com/mostley/lightnet#readme",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-util": "^3.0.7"
+  }
+}
