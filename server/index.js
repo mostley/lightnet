@@ -1,9 +1,10 @@
+var child_process = require('child_process');
 var mongoose   = require('mongoose');
 var express    = require('express');
 var bodyParser = require('body-parser');
 var docs = require("express-mongoose-docs");
 
-var config = require('./config');
+var config = require('./config.json');
 var lightRoutes = require('./routes/lightroutes');
 var controlRoutes = require('./routes/controlroutes');
 var handlerRoutes = require('./routes/handlerroutes');
@@ -50,7 +51,7 @@ app.use(function(req, res, next) {
 
 router.get('/', function(req, res) {
   console.log('route / hit');
-  res.json({ message: 'Welcome to the LightNet. A LabNet Service provided to you by FabLab Karlsruhe e.V.' });
+  res.json({ message: 'Welcome to the LightNet. Your friendly neighborhood Light Management Server' });
 });
 
 lightRoutes(router, app, expressWs);

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mostley/lightnet#readme",
   "dependencies": {
     "gulp": "^3.9.1",
-    "gulp-util": "^3.0.7"
+    "gulp-util": "^3.0.7",
+    "inquirer": "^3.0.1"
   }
 }

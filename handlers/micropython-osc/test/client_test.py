@@ -1,4 +1,4 @@
-import time, math, socket, os, ustruct
+import utime, math, usocket, uos, ustruct
 
 IP = "192.168.178.28"
 numberOfLeds = 255
@@ -18,7 +18,7 @@ for b in range(bottleCount):
 
 
 def randomByte():
-    return ustruct.unpack('<H', os.urandom(1))[0]
+    return ustruct.unpack('<H', uos.urandom(1))[0]
 
 def shuffle(items):
     for i in reversed(range(1, len(items))):
@@ -115,7 +115,7 @@ def bottlegame(n):
     return result
 
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock = usocket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 n = 0
 while True:
@@ -128,7 +128,7 @@ while True:
     #msg = createBlobMessage(bottlegame(n))
 
     sock.sendto(msg, socket.getaddrinfo(IP, 2525, socket.AF_INET)[0][4])
-    time.sleep_ms(100)
+    utime.sleep_ms(100)
 
     n += 1
 
