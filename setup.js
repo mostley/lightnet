@@ -10,9 +10,8 @@ var exec = require('child_process').exec;
   1. configure IP
   2. select DB
   3. select install path
-  4. autostart?
-  5. install
-  6. start all the things
+  4. start all the things
+  //5. autostart?
 */
 
 var questionFactory = {
@@ -42,19 +41,16 @@ var questionFactory = {
         message: 'What Database do you wish to use?',
         choices: [
           {
-            value: 'local',
             name: 'local' + gutil.colors.grey(' - already running'),
-            key: 'l'
+            value: 'local'
           },
           {
-            value: 'docker',
             name: 'docker' + gutil.colors.grey(' - start locally with docker (requires Docker installed and working for the current user)'),
-            key: 'd'
+            value: 'docker'
           },
           {
-            value: 'remote',
             name: 'remote' + gutil.colors.grey(' - enter a remote address next'),
-            key: 'r'
+            value: 'remote'
           },
         ]
       });
@@ -82,7 +78,7 @@ function askQuestions(interfaces) {
     questionFactory.interface(),
     questionFactory.database(),
     questionFactory.startnow(),
-    questionFactory.autostart()
+    //questionFactory.autostart()
   ]).then(questions => inquirer.prompt(questions));
 }
 
@@ -131,7 +127,24 @@ function getAddressForInterface(interface) {
 
 function npmInstall(directory) {
   return new Promise(function(resolve, reject) {
-    var cmd = 'cd ' + directory + ' && npm install && cd ..';
+    var cmd = 'cd ' + directory + ' && npm install';
+    exec(cmd, function(error, stdout, stderr) {
+      if (error) {
+        console.error(error);
+        reject(error);
+        return;
+      }
+
+      console.log('done.');
+
+      resolve(stdout);
+    });
+  });
+}
+
+function npmStart(directory) {
+  return new Promise(function(resolve, reject) {
+    var cmd = 'cd ' + directory + ' && npm run daemon';
     exec(cmd, function(error, stdout, stderr) {
       if (error) {
         console.error(error);
@@ -149,7 +162,7 @@ function npmInstall(directory) {
 function startMongoInDocker() {
   return new Promise(function(resolve, reject) {
     var containerName = 'lightnet_mongo';
-    var cmd = 'docker run -d --name ' + containerName + ' mongo';
+    var cmd = 'docker run -d -p 27017:27017 --hostname ' + containerName + ' --name ' + containerName + ' mongo';
     exec(cmd, function(error, stdout, stderr) {
       if (error) {
         console.error(error);
@@ -166,11 +179,11 @@ function startMongoInDocker() {
 
 function handleDBSelection(databaseType) {
   if (databaseType === 'local') {
-    return Promise.resolve('mongodb://mongo/lightnet');
+    return Promise.resolve('mongodb://localhost:27017/lightnet');
   } else if (databaseType === 'docker') {
     return startMongoInDocker()
       .then(containerName => {
-        return 'mongodb://' + containerName + '/lightnet';
+        return 'mongodb://localhost:27017/lightnet';
       })
   } else if (databaseType === 'remote') {
     return askForDBUrl()
@@ -197,10 +210,27 @@ function startLightnet() {
       return npmInstall('webinterface');
     }).then(() => {
       console.log('Starting the ' + gutil.colors.cyan('Lightnet Server'));
+      return npmStart('server', 'npm start');
+    }).then(() => {
       console.log('Starting the ' + gutil.colors.cyan('Lightnet Webinterface'));
+      return npmStart('webinterface', 'npm start');
+    }).then(() => {
       //TODO start server and webinterface
     });
 }
+
+console.log('\n\n'+
+'╔════════════════════════════════════════════════════════════════════════════════════╗\n'+
+'║   __         __     ______     __  __     ______   __   __     ______     ______   ║\n'+
+'║  /\\ \\       /\\ \\   /\\  ___\\   /\\ \\_\\ \\   /\\__  _\\ /\\ "-.\\ \\   /\\  ___\\   /\\__  _\\  ║\n'+
+'║  \\ \\ \\____  \\ \\ \\  \\ \\ \\__ \\  \\ \\  __ \\  \\/_/\\ \\/ \\ \\ \\-.  \\  \\ \\  __\\   \\/_/\\ \\/  ║\n'+
+'║   \\ \\_____\\  \\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\    \\ \\_\\  \\ \\_\\\\"\\_\\  \\ \\_____\\    \\ \\_\\  ║\n'+
+'║    \\/_____/   \\/_/   \\/_____/   \\/_/\\/_/     \\/_/   \\/_/ \\/_/   \\/_____/     \\/_/  ║\n'+
+'║                                                                                    ║\n'+
+'╚════════════════════════════════════════════════════════════════════════════════════╝\n'+
+gutil.colors.bold('\n  LightNet Automated Setup v' + require('./package.json').version + ' \n\n')+
+'This setup will ask you a few questions to determine your lightnet configuration. \n');
+console.log('# running in node v' + process.versions.node + '\n\n');
 
 askQuestions()
   .then(answers => {

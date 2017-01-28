@@ -84,8 +84,9 @@ pinger();
 // =============================================================================
 lightcleaner();
 
-executioner = child_process.fork('execution/executionspawner');
+/*executioner = child_process.fork('./execution/executionspawner');
 
 process.on('exit', function() {
   executioner.kill();
 });
+*/

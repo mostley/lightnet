@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "daemon": "forever start index.js"
   },
   "author": "Sven Hecht <sven.hecht@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "express": "^4.13.3",
+    "forever": "^0.15.3",
     "hogan-express": "^0.5.2",
     "hogan-express-partials": "0.0.3"
   }

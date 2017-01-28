@@ -4,7 +4,8 @@
   "description": "Lightmanagement Server to control room lighting",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "daemon": "forever start index.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
     "express-mongoose-docs": "^0.3.1",
+    "forever": "^0.15.3",
     "mongoose": "^4.5.5",
     "object-assign": "^4.1.0",
     "osc": "^2.1.0",

@@ -2,7 +2,7 @@
 	"appIP": "192.168.178.24",
 	"appPort": 4050,
 	"xdbUrl": "mongodb://teachable:teachable@ds015892.mlab.com:15892/teachable",
-	"dbUrl": "mongodb://mongo/lightnet",
+	"dbUrl": "mongodb://localhost:27017/lightnet",
 	"discoverySrcPort": 25251,
 	"discoveryPort": 3535,
 	"discoveryInterval": 3000,
