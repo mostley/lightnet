@@ -41,15 +41,19 @@ var questionFactory = {
         message: 'What Database do you wish to use?',
         choices: [
           {
-            name: 'local' + gutil.colors.grey(' - already running'),
+            name: 'Local' + gutil.colors.grey(' - already running'),
             value: 'local'
           },
           {
-            name: 'docker' + gutil.colors.grey(' - start locally with docker (requires Docker installed and working for the current user)'),
+            name: 'Docker' + gutil.colors.grey(' - start locally with docker (requires Docker installed and working for the current user)'),
             value: 'docker'
           },
           {
-            name: 'remote' + gutil.colors.grey(' - enter a remote address next'),
+            name: 'RPI Docker' + gutil.colors.grey(' - start locally with docker on Raspberry PI (requires Docker installed and working for the current user)'),
+            value: 'docker-rpi'
+          },
+          {
+            name: 'Remote' + gutil.colors.grey(' - enter a remote address next'),
             value: 'remote'
           },
         ]
@@ -159,10 +163,10 @@ function npmStart(directory) {
   });
 }
 
-function startMongoInDocker() {
+function startMongoInDocker(mongoImage) {
   return new Promise(function(resolve, reject) {
     var containerName = 'lightnet_mongo';
-    var cmd = 'docker run -d -p 27017:27017 --hostname ' + containerName + ' --name ' + containerName + ' mongo';
+    var cmd = 'docker run -d -p 27017:27017 --hostname ' + containerName + ' --name ' + containerName + ' ' + mongoImage;
     exec(cmd, function(error, stdout, stderr) {
       if (error) {
         console.error(error);
@@ -181,7 +185,12 @@ function handleDBSelection(databaseType) {
   if (databaseType === 'local') {
     return Promise.resolve('mongodb://localhost:27017/lightnet');
   } else if (databaseType === 'docker') {
-    return startMongoInDocker()
+    return startMongoInDocker('mongo')
+      .then(containerName => {
+        return 'mongodb://localhost:27017/lightnet';
+      })
+  } else if (databaseType === 'docker-rpi') {
+    return startMongoInDocker('dhermanns/rpi-mongo')
       .then(containerName => {
         return 'mongodb://localhost:27017/lightnet';
       })
