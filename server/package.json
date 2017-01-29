@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "daemon": "forever start index.js"
+    "daemon": "forever start --uid lightnet_server index.js"
   },
   "repository": {
     "type": "git",

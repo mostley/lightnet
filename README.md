@@ -12,6 +12,19 @@ npm install
 node setup.js
 ```
 
+## Install on Raspberry Pi Zero
+
+Make sure the Device is connected to the network.
+
+```
+sudo apt-get install mongodb
+git clone https://github.com/mostley/lightnet.git
+npm install
+node setup.js
+```
+
+Choose ```local``` as DB Option.
+
 ## Features
 
 * Discovery of handlers

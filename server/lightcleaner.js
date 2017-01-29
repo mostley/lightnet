@@ -5,7 +5,8 @@ function cleanupOldLights() {
   console.log("Start cleaning up old inactive lights");
 
   var cutoff = new Date();
-  cutoff.setDate(cutoff.getTime() - 5*60000); // 5 min ago
+  //cutoff.setDate(cutoff.getTime() - 5*60000); // 5 min ago
+  cutoff.setMinutes(cutoff.getMinutes()-5);
   Light.find({deactivated: {$lt: cutoff}, active: false}, function (err, oldLights) {
       if (err) {
         console.error(err);

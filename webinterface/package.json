@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "daemon": "forever start index.js"
+    "daemon": "forever start --uid lightnet_webinterface index.js"
   },
   "author": "Sven Hecht <sven.hecht@gmail.com>",
   "license": "MIT",
