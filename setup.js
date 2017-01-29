@@ -49,10 +49,6 @@ var questionFactory = {
             value: 'docker'
           },
           {
-            name: 'RPI Docker' + gutil.colors.grey(' - start locally with docker on Raspberry PI (requires Docker installed and working for the current user)'),
-            value: 'docker-rpi'
-          },
-          {
             name: 'Remote' + gutil.colors.grey(' - enter a remote address next'),
             value: 'remote'
           },
@@ -187,11 +183,6 @@ function handleDBSelection(databaseType) {
     return Promise.resolve('mongodb://localhost:27017/lightnet');
   } else if (databaseType === 'docker') {
     return startMongoInDocker('mongo')
-      .then(containerName => {
-        return 'mongodb://localhost:27017/lightnet';
-      })
-  } else if (databaseType === 'docker-rpi') {
-    return startMongoInDocker('dhermanns/rpi-mongo')
       .then(containerName => {
         return 'mongodb://localhost:27017/lightnet';
       })
