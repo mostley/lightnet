@@ -3,6 +3,15 @@
 # lightnet
 Lightmanagement Server to control room lighting
 
+# Setup
+
+You will need a recent version of node js (http://nodejs.org/).
+To configure, install and start run:
+```
+npm install
+node setup.js
+```
+
 ## Features
 
 * Discovery of handlers
