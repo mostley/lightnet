@@ -1,5 +1,6 @@
 var child_process = require('child_process');
 var mongoose   = require('mongoose');
+var morgan = require('morgan');
 var express    = require('express');
 var bodyParser = require('body-parser');
 var docs = require("express-mongoose-docs");
@@ -32,6 +33,7 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 docs(app, mongoose);
+app.use(morgan('combined'))
 
 var expressWs = require('express-ws')(app);
 

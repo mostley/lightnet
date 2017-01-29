@@ -1,12 +1,8 @@
-var Lightnet = {
-  apiUrl: 'http://192.168.178.24:4050/api/',
-  pollingInterval: 5000,
-  activeManager: null,
-  lightManager: null,
-  roomManager: null,
-  lightsourceManager: null,
-  animationManager: null
-};
+Lightnet.activeManager = null;
+Lightnet.lightManager = null;
+Lightnet.roomManager = null;
+Lightnet.lightsourceManager = null;
+Lightnet.animationManager = null;
 
 function activateManager(mgr) {
   if (Lightnet.activeManager) {

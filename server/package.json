@@ -24,6 +24,7 @@
     "express-ws": "^2.0.0",
     "forever": "^0.15.3",
     "mongoose": "^4.5.5",
+    "morgan": "^1.7.0",
     "object-assign": "^4.1.0",
     "osc": "^2.1.0",
     "ping": "^0.1.10",

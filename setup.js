@@ -194,11 +194,22 @@ function handleDBSelection(databaseType) {
   }
 }
 
-function updateConfig(updateFunc) {
-    var config = require('./server/config.json');
-    updateFunc(config);
-    fs.writeFileSync('./server/config.json', JSON.stringify(config, null, '\t'), 'utf8');
-    return Promise.resolve();
+function updateServerConfig(updateFunc) {
+  var fileName = './server/config.json';
+  var config = require(fileName);
+  updateFunc(config);
+  fs.writeFileSync(fileName, JSON.stringify(config, null, '\t'), 'utf8');
+  return Promise.resolve();
+}
+
+function updateWebInterfaceConfig(ipAddress) {
+  var fileName = './webinterface/public/js/config.js';
+  var config = fs.readFileSync(fileName, 'utf-8');
+  var re = /(.*apiUrl: ')([^']*)('.*)/;
+  config = config.replace(re, '$1http://' + ipAddress + ':4050/api/$3');
+  fs.writeFileSync(fileName, config, 'utf-8');
+
+  return Promise.resolve();
 }
 
 function startLightnet() {
@@ -252,11 +263,13 @@ askQuestions()
     console.log('using IP ' + gutil.colors.cyan(answers.ipAddress));
     console.log('using DB at ' + gutil.colors.cyan(answers.database));
 
-    return updateConfig(config => {
+    return updateServerConfig(config => {
       config.appIP = answers.ipAddress;
       config.dbUrl = answers.database;
     }).then(() => {
-      console.log('updated config.json');
+      return updateWebInterfaceConfig(answers.ipAddress);
+    }).then(() => {
+      console.log('updated config files');
       return answers;
     });
   })
