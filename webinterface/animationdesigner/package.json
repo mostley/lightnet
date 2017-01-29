@@ -1,0 +1,30 @@
+{
+  "name": "animationdesigner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "test": "react-scripts test"
+  },
+  "author": "Sven Hecht <sven.hecht@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "enzyme": "^2.7.1",
+    "loadash": "0.0.1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-redux": "^5.0.2",
+    "react-router": "^3.0.2",
+    "react-router-redux": "^4.0.7",
+    "react-scripts": "^0.8.5",
+    "redux": "^3.6.0",
+    "redux-devtools": "^3.3.2",
+    "redux-devtools-dock-monitor": "^1.1.1",
+    "redux-devtools-log-monitor": "^1.2.0",
+    "redux-logger": "^2.7.4",
+    "redux-thunk": "^2.2.0"
+  }
+}

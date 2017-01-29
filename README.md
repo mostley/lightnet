@@ -12,6 +12,8 @@ npm install
 node setup.js
 ```
 
+Tested on Raspbian and OSX.
+
 ## Install on Raspberry Pi Zero
 
 Make sure the Device is connected to the network.

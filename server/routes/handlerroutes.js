@@ -7,7 +7,7 @@ module.exports = function(router) {
 
     // TODO figure out how this is possible with mongoose
     // get handlers (GET http://localhost:4020/api/handlers)
-    /*.get(function(req, res) {
+    .get(function(req, res) {
       console.log('get handlers');
 
       Light.find(function(err, lights) {
@@ -17,13 +17,20 @@ module.exports = function(router) {
           return;
         }
 
-        console.log(lights);
+        var handlers = {};
+        for (var i in lights) {
+          var light = lights[i];
 
-        var handlers = lights.map(function(light) { return light.toHandler(); });
+          if (light) {
+            if (!handlers[light.handlerID]) {
+              handlers[light.handlerID] = light.toHandler();
+            }
+          }
+        }
 
-        res.json(handlers);
+        res.json(Object.keys(handlers).map(i => handlers[i]));
       });
-    })*/
+    })
 
     // create an handler (POST http://localhost:4020/api/handlers)
     .post(function(req, res) {
