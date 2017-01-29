@@ -165,6 +165,7 @@ function npmStart(directory) {
 
 function startMongoInDocker(mongoImage) {
   return new Promise(function(resolve, reject) {
+    console.log('Starting Docker container (' + containerName + ') as daemon.');
     var containerName = 'lightnet_mongo';
     var cmd = 'docker run -d -p 27017:27017 --hostname ' + containerName + ' --name ' + containerName + ' ' + mongoImage;
     exec(cmd, function(error, stdout, stderr) {
@@ -174,7 +175,7 @@ function startMongoInDocker(mongoImage) {
         return;
       }
 
-      console.log('Docker container ("' + containerName + '") was started as daemon.');
+      console.log('done.');
 
       resolve(containerName);
     });
