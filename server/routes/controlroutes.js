@@ -276,7 +276,7 @@ module.exports = function(router, app, expressWs) {
 
   router.route('/handlers/:handler_id/control')
 
-    // get the effective color of every light by handler ID (GET http://localhost:4020/api/lights/:light_id/control)
+    // get the effective color of every light by handler ID (GET http://localhost:4020/api/handlers/:handler_id/control)
     .get(function(req, res) {
       console.log('get control handler ' + req.params.handler_id);
 
@@ -307,8 +307,32 @@ module.exports = function(router, app, expressWs) {
           colors[light.index] = color;
         }
 
-        res.json(colors);
+        res.json(Object.keys(colors).map(i => colors[i]));
       });
-    });
+    })
+
+      // put the effective color of every light by handler ID (PUT http://localhost:4020/api/handlers/:handler_id/control)
+      .put(function(req, res) {
+        console.log('put control handler ' + req.params.handler_id);
+
+        Light.findOne({ handlerID: req.params.handler_id }, function(err, light) {
+          if (err) {
+            console.error(err);
+            res.send(err);
+            return;
+          }
+
+          if (!light) {
+            res.status(404).send('handler "' + req.params.handler_id + '" not found');
+            return;
+          }
+
+          var handler = light.toHandler();
+
+          handler.setPattern(req.body);
+
+          res.json(handler);
+        });
+      });
 
 };

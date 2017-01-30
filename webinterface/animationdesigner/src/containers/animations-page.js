@@ -23,9 +23,39 @@ class AnimationsPage extends Component {
     </li>;
   }
 
+  sendFrame(handler, color) {
+    var data = [];
+    for (var i=0;i<handler.numberOfLeds; i++) {
+      data[i] = color;
+    }
+
+    fetch(`http://localhost:4050/api/handlers/${handler.id}/control`, {
+        method: 'PUT',
+        headers: new Headers({
+      		'Content-Type': 'application/json'
+      	}),
+        body: JSON.stringify(data)
+      })
+      .then((err, res) => {
+        console.log(err, res);
+      }).catch(function(err) {
+      	console.error(err);
+      });
+  }
+
   renderHandlerGroup(handler) {
-    return <div key={handler.id}>
-      <h1>Animations for {handler.id}</h1>
+    console.log('renderHandlerGroup', handler);
+
+    return <div className="handler-group" key={handler.id}>
+      <h1>{handler.id}</h1>
+
+      <button className="button" onClick={() => this.sendFrame(handler, [0,0,0])}>Off</button>
+      <button className="button" onClick={() => this.sendFrame(handler, [255,0,0])}>Red</button>
+      <button className="button" onClick={() => this.sendFrame(handler, [0,255,0])}>Green</button>
+      <button className="button" onClick={() => this.sendFrame(handler, [0,0,255])}>Blue</button>
+      <button className="button" onClick={() => this.sendFrame(handler, [255,0,255])}>Purpur</button>
+      <button className="button" onClick={() => this.sendFrame(handler, [255,255,255])}>White</button>
+
       <ul>
         {this.props.animations
           .filter(anim => anim.handlerID === handler.id)
@@ -38,7 +68,7 @@ class AnimationsPage extends Component {
     const { handlers } = this.props;
 
     return (
-      <div>
+      <div className="page">
         {handlers.map(this.renderHandlerGroup.bind(this))}
       </div>
     )

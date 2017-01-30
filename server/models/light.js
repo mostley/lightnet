@@ -2,6 +2,7 @@ var request      = require('request');
 var mongoose     = require('mongoose');
 var osc          = require("osc");
 var config       = require('../config');
+var Handler       = require('./handler');
 var Schema       = mongoose.Schema;
 
 var Vector3 = require('./math/vector3');
@@ -149,22 +150,7 @@ LightSchema.methods.updateCubeCoordinates = function () {
 };
 
 LightSchema.methods.toHandler = function() {
-    return {
-        id: this.handlerID,
-        ipAddress: this.handler,
-        info: this.handlerInfo,
-        type: this.handlerType,
-        version: this.handlerVersion,
-        offsetX: this.handlerOffsetX,
-        offsetY: this.handlerOffsetY,
-        offsetZ: this.handlerOffsetZ,
-        GeometryWidth: this.handlerGeometryWidth,
-        GeometryHeight: this.handlerGeometryHeight,
-        GeometryLength: this.handlerGeometryLength,
-        GeometryDirection1: this.handlerGeometryDirection1,
-        GeometryDirection2: this.handlerGeometryDirection2,
-        GeometryDirection3: this.handlerGeometryDirection3
-    };
+    return new Handler(this);
 };
 
 LightSchema.methods.setColorViaHTTP = function (color) {

@@ -1,5 +1,5 @@
 var Light = require('./models/light');
-var config = require('./config');
+var config = require('./config.json');
 
 function cleanupOldLights() {
   console.log("Start cleaning up old inactive lights");

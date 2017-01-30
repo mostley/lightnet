@@ -28,7 +28,17 @@ module.exports = function(router) {
           }
         }
 
-        res.json(Object.keys(handlers).map(i => handlers[i]));
+        let result = Object.keys(handlers)
+              .map(i => {
+                let handler = handlers[i];
+
+                handler.lights = lights.filter(l => l.handlerID === handler.id);
+                handler.lightCount = lights.length;
+
+                return handler;
+              });
+
+        res.json(result);
       });
     })
 
@@ -87,14 +97,15 @@ module.exports = function(router) {
 
         if (light) {
           var handler = light.toHandler();
-          Light.count({ handlerID: req.params.handler_id }, function(err, lightCount) {
+          Light.find({ handlerID: req.params.handler_id }, function(err, lights) {
             if (err) {
               console.error(err);
               res.send(err);
               return;
             }
 
-            handler.lightCount = lightCount;
+            handler.lightCount = lights.length;
+            handler.lights = lights;
             res.json(handler);
           });
         } else {

@@ -1,6 +1,6 @@
 var os = require('os');
 var dgram = require('dgram');
-var config = require('./config');
+var config = require('./config.json');
 
 var lightNetVersion = require('./package.json').version;
 

@@ -45,6 +45,7 @@ class App extends Component {
     return (
       <div>
         <div className="navigation">
+          <span className="logo">LightNet</span>
           <Link to={`/animations`}>Animations</Link>
           <Link to={`/handlers`}>Handler Configuration</Link>
         </div>

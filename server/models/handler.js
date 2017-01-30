@@ -1,11 +1,12 @@
 var dgram        = require('dgram');
 
-export default class Handler {
+class Handler {
 
   constructor(data) {
     this.active = data.active;
     this.room = data.room;
     this.ipAddress = data.handler;
+    this.id = data.handlerID;
     this.identifier = data.handlerID;
     this.info = data.handlerInfo;
     this.type = data.handlerType;
@@ -25,7 +26,7 @@ export default class Handler {
     this.numberOfLeds = this.geometry.width * this.geometry.height * this.geometry.length;
   }
 
-  function createBlobMessage(data) {
+  createBlobMessage(data) {
     var result = new Buffer(data.length*3);
 
     var n = 0;
@@ -42,13 +43,13 @@ export default class Handler {
   }
 
   setPatternViaUDP(data) {
-    const message = createBlobMessage(data);
+    const message = this.createBlobMessage(data);
     const client = dgram.createSocket('udp4');
-    client.send(message, 0, message.length, PORT, HOST, err => {
+    client.send(message, 0, message.length, 2525, this.ipAddress, err => {
       if (err) {
         console.error(err);
       }
-      console.log('UDP message sent to ' + HOST +':'+ PORT);
+      console.log('UDP message sent to ' + this.ipAddress + ':2525');
       client.close();
     });
   }
@@ -65,3 +66,5 @@ export default class Handler {
       }
   };
 }
+
+module.exports = Handler;

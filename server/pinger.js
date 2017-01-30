@@ -1,7 +1,7 @@
 var ping = require('ping');
 
 var Light = require('./models/light');
-var config = require('./config');
+var config = require('./config.json');
 
 function setLightActiveByHandler(handler, active) {
   Light.find({ handler: handler }, function(err, lights) {
