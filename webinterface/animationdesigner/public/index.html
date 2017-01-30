@@ -24,6 +24,11 @@
         display: inline-block;
         margin-left: 10px;
         margin-right: 20px;
+        padding: 0;
+      }
+      .navigation a.logo:hover {
+        background-color: transparent;
+
       }
       .navigation a {
         text-decoration: none;
@@ -31,8 +36,11 @@
         padding: 10px;
         display: inline-block;
       }
-      .navigation a:hover {
+      .navigation a.active {
         background-color: #666;
+      }
+      .navigation a:hover {
+        background-color: #999;
         color: #fff;
       }
       .page {

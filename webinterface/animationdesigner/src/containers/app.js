@@ -45,9 +45,9 @@ class App extends Component {
     return (
       <div>
         <div className="navigation">
-          <span className="logo">LightNet</span>
-          <Link to={`/animations`}>Animations</Link>
-          <Link to={`/handlers`}>Handler Configuration</Link>
+          <Link className="logo" to={`/`}>LightNet</Link>
+          <Link to={`/animations`} activeClassName="active">Animations</Link>
+          <Link to={`/handlers`} activeClassName="active">Handlers</Link>
         </div>
         {this.renderErrorMessage()}
         {children}
