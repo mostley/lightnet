@@ -29,7 +29,7 @@ class AnimationsPage extends Component {
       data[i] = color;
     }
 
-    fetch(`http://localhost:4050/api/handlers/${handler.id}/control`, {
+    fetch(`http://lightnetserver.local:4050/api/handlers/${handler.id}/control`, {
         method: 'PUT',
         headers: new Headers({
       		'Content-Type': 'application/json'
