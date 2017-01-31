@@ -1,4 +1,4 @@
-const API_ROOT = 'http://lightnetserver.local:4050/api/'
+const API_ROOT = 'http://lightnetserver:4050/api/'
 
 // Fetches an API response
 const callApi = (endpoint) => {
