@@ -9,7 +9,7 @@ export default class LightEditor extends Component {
   static defaultProps = {
   };
 
-  renderLight(light) {
+  renderLight(light/*: Light*/) {
     const { frame } = this.props;
     const data = frame[light.index];
 

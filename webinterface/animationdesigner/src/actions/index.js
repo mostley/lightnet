@@ -16,7 +16,7 @@ const fetchHandlers = (endpoint) => ({
 // Fetches a page of handlers.
 // Bails out if page is cached and user didn't specifically request next page.
 // Relies on Redux Thunk middleware.
-export const loadHandlers = () => (dispatch, getState) => {
+export const loadHandlers = () => (dispatch/* : function */, getState/* : function */) => {
   return dispatch(fetchHandlers(`handlers/`));
 };
 
@@ -31,7 +31,7 @@ const fetchAnimations = (endpoint) => ({
   }
 });
 
-export const loadAnimations = () => (dispatch, getState) => {
+export const loadAnimations = () => (dispatch/* : function */, getState/* : function */) => {
   return dispatch(fetchAnimations(`animations/`));
 };
 

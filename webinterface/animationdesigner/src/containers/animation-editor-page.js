@@ -1,20 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { loadAnimation, loadHandler } from '../actions';
+import { loadAnimations, loadHandlers } from '../actions';
 import { Link } from 'react-router';
 
 import LightEditor from '../components/lighteditor';
 
-const loadData = ({ loadAnimation, loadHandler }) => {
-  loadAnimation()
+const loadData = ({ loadAnimations, loadHandlers }) => {
+  loadAnimations()
     .then(animation => {
-      loadHandler(animation.handlerId);
+      loadHandlers(animation.handlerId);
     })
 };
 
 class AnimationEditorPage extends Component {
   static propTypes = {
-    loadAnimation: PropTypes.func.isRequired,
+    loadAnimations: PropTypes.func.isRequired,
     animation: PropTypes.object,
     handler: PropTypes.object,
     currentFrame: PropTypes.number
@@ -29,7 +29,7 @@ class AnimationEditorPage extends Component {
   }
 
   render() {
-    const { animation, currentHandler, currentFrame } = this.props;
+    const { animation, currentHandler, currentFrame, handler } = this.props;
 
     return (
       <div>
@@ -46,5 +46,5 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 export default connect(mapStateToProps, {
-  loadAnimation, loadHandler
+  loadAnimations, loadHandlers
 })(AnimationEditorPage);

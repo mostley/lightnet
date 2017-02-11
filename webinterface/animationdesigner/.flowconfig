@@ -1,0 +1,13 @@
+[include]
+
+[ignore]
+<PROJECT_ROOT>/build/.*
+<PROJECT_ROOT>/node_modules/.*
+<PROJECT_ROOT>/libdefs.js
+
+[libs]
+./libdefs.js
+./typedefs.js
+
+[options]
+all=true

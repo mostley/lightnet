@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
-const Handler = ({ handler }) => {
+const Handler = ({ handler }/* : { handler: HandlerType } */) => {
   const { id, lights, name } = handler;
 
   return (
